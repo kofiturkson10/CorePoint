@@ -1,6 +1,47 @@
 @CompanyPortal.Api_HostAddress = http://localhost:5042
+# The auth cookie is Secure, so auth requests must use https (run with: dotnet run --launch-profile https)
+@CompanyPortal.Api_HttpsAddress = https://localhost:7073
 
 GET {{CompanyPortal.Api_HostAddress}}/api/health
 Accept: application/json
+
+###
+
+# 1. Not logged in yet - expect 401 Unauthorized
+GET {{CompanyPortal.Api_HttpsAddress}}/api/auth/me
+Accept: application/json
+
+###
+
+# 2. Wrong password - expect 401 with "Invalid email or password."
+POST {{CompanyPortal.Api_HttpsAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "demo@company.test",
+  "password": "wrong-password"
+}
+
+###
+
+# 3. Correct login - expect 200 and a Set-Cookie header (the cookie is stored for the next requests)
+POST {{CompanyPortal.Api_HttpsAddress}}/api/auth/login
+Content-Type: application/json
+
+{
+  "email": "demo@company.test",
+  "password": "Demo1234!"
+}
+
+###
+
+# 4. Protected endpoint - expect 200 with your user details (only works after step 3)
+GET {{CompanyPortal.Api_HttpsAddress}}/api/auth/me
+Accept: application/json
+
+###
+
+# 5. Log out - expect 204 No Content
+POST {{CompanyPortal.Api_HttpsAddress}}/api/auth/logout
 
 ###
