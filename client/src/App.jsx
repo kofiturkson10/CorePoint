@@ -1,34 +1,16 @@
-import { useEffect, useState } from 'react'
+import { useAuth } from './authContext.js'
+import DashboardPage from './DashboardPage.jsx'
+import LoginPage from './LoginPage.jsx'
 
 function App() {
-  const [health, setHealth] = useState(null)
-  const [error, setError] = useState(null)
+  const { user, isLoading } = useAuth()
 
-  useEffect(() => {
-    async function fetchHealth() {
-      try {
-        const response = await fetch('/api/health')
-        if (!response.ok) {
-          throw new Error(`HTTP ${response.status}`)
-        }
-        setHealth(await response.json())
-      } catch (err) {
-        setError(err.message)
-      }
-    }
+  // Avoid flashing the login form while we check if the user is already logged in
+  if (isLoading) {
+    return <p>Laddar...</p>
+  }
 
-    fetchHealth()
-  }, [])
-
-  return (
-    <main>
-      <h1>Företagsportal</h1>
-      <h2>Backend status</h2>
-      {error && <p>Kunde inte nå backend: {error}</p>}
-      {!error && !health && <p>Laddar...</p>}
-      {health && <pre>{JSON.stringify(health, null, 2)}</pre>}
-    </main>
-  )
+  return user ? <DashboardPage /> : <LoginPage />
 }
 
 export default App

@@ -5,9 +5,13 @@ import { defineConfig } from 'vite'
 export default defineConfig({
   plugins: [react()],
   server: {
-    // Forward /api requests to the ASP.NET Core backend during development
+    // Forward /api requests to the ASP.NET Core backend during development.
+    // Uses the https profile (the auth cookie is Secure); secure: false accepts the dev certificate.
     proxy: {
-      '/api': 'http://localhost:5042',
+      '/api': {
+        target: 'https://localhost:7073',
+        secure: false,
+      },
     },
   },
 })
