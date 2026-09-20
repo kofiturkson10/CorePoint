@@ -41,7 +41,86 @@ Accept: application/json
 
 ###
 
-# 5. Log out - expect 204 No Content
+# --- Employees (all require login, so run step 3 first) ---
+
+# 5. List all employees - expect 200 with an array
+GET {{CompanyPortal.Api_HttpsAddress}}/api/employees
+Accept: application/json
+
+###
+
+# 6. Create an employee - expect 201 with the new employee and a Location header
+# @name createEmployee
+POST {{CompanyPortal.Api_HttpsAddress}}/api/employees
+Content-Type: application/json
+
+{
+  "name": "Anna Svensson",
+  "department": "IT",
+  "role": "Developer",
+  "email": "anna@company.test"
+}
+
+###
+
+# 7. Create the same email again - expect 409 Conflict (run step 6 first)
+POST {{CompanyPortal.Api_HttpsAddress}}/api/employees
+Content-Type: application/json
+
+{
+  "name": "Anna Andersson",
+  "department": "HR",
+  "role": "Recruiter",
+  "email": "anna@company.test"
+}
+
+###
+
+# 8. Invalid data - expect 400 Bad Request with validation errors
+POST {{CompanyPortal.Api_HttpsAddress}}/api/employees
+Content-Type: application/json
+
+{
+  "name": "",
+  "department": "IT",
+  "role": "Developer",
+  "email": "not-an-email"
+}
+
+###
+
+# 9. Get one employee - expect 200 (uses the id from step 6)
+GET {{CompanyPortal.Api_HttpsAddress}}/api/employees/{{createEmployee.response.body.id}}
+Accept: application/json
+
+###
+
+# 10. Update the employee - expect 200 with the changed values (uses the id from step 6)
+PUT {{CompanyPortal.Api_HttpsAddress}}/api/employees/{{createEmployee.response.body.id}}
+Content-Type: application/json
+
+{
+  "name": "Anna Svensson",
+  "department": "IT",
+  "role": "Tech Lead",
+  "email": "anna@company.test"
+}
+
+###
+
+# 11. Delete the employee - expect 204 No Content (uses the id from step 6)
+DELETE {{CompanyPortal.Api_HttpsAddress}}/api/employees/{{createEmployee.response.body.id}}
+Accept: application/json
+
+###
+
+# 12. Get the deleted employee - expect 404 Not Found
+GET {{CompanyPortal.Api_HttpsAddress}}/api/employees/{{createEmployee.response.body.id}}
+Accept: application/json
+
+###
+
+# 13. Log out - expect 204 No Content
 POST {{CompanyPortal.Api_HttpsAddress}}/api/auth/logout
 
 ###
