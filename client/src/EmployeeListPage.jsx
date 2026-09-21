@@ -1,8 +1,9 @@
 import { useEffect, useState } from 'react'
+import { Link } from 'react-router-dom'
 import { readErrorMessage } from './apiErrors.js'
 import EmployeeForm from './EmployeeForm.jsx'
 
-function EmployeeListPage({ onBack }) {
+function EmployeeListPage() {
   const [employees, setEmployees] = useState([])
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
@@ -74,9 +75,7 @@ function EmployeeListPage({ onBack }) {
       <h1>Företagsportal</h1>
       <h2>Medarbetare</h2>
       <p>
-        <button type="button" onClick={onBack}>
-          Tillbaka till dashboarden
-        </button>
+        <Link to="/dashboard">Tillbaka till dashboarden</Link>
       </p>
 
       {formTarget === null ? (

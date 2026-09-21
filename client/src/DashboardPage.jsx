@@ -1,6 +1,7 @@
+import { Link } from 'react-router-dom'
 import { useAuth } from './authContext.js'
 
-function DashboardPage({ onShowEmployees }) {
+function DashboardPage() {
   const { user, logout } = useAuth()
 
   return (
@@ -10,9 +11,7 @@ function DashboardPage({ onShowEmployees }) {
       <p>Välkommen, {user.displayName}!</p>
       <p>Inloggad som {user.email}</p>
       <p>
-        <button type="button" onClick={onShowEmployees}>
-          Visa medarbetare
-        </button>
+        <Link to="/employees">Visa medarbetare</Link>
       </p>
       <button type="button" onClick={logout}>
         Logga ut
