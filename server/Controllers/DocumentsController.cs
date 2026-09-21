@@ -20,6 +20,13 @@ public class DocumentsController : ControllerBase
         _documentService = documentService;
     }
 
+    [HttpGet]
+    public async Task<ActionResult<List<DocumentInfo>>> GetAllAsync()
+    {
+        var documents = await _documentService.ListAsync();
+        return Ok(documents);
+    }
+
     // multipart/form-data with a single field named "file".
     // The size limit is set a bit above the file limit to leave room for the multipart overhead.
     [HttpPost]
