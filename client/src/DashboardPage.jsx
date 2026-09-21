@@ -13,6 +13,9 @@ function DashboardPage() {
       <p>
         <Link to="/employees">Visa medarbetare</Link>
       </p>
+      <p>
+        <Link to="/news">Visa nyheter</Link>
+      </p>
       <button type="button" onClick={logout}>
         Logga ut
       </button>
