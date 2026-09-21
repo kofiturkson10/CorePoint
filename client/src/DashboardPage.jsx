@@ -1,6 +1,6 @@
 import { useAuth } from './authContext.js'
 
-function DashboardPage() {
+function DashboardPage({ onShowEmployees }) {
   const { user, logout } = useAuth()
 
   return (
@@ -9,6 +9,11 @@ function DashboardPage() {
       <h2>Dashboard</h2>
       <p>Välkommen, {user.displayName}!</p>
       <p>Inloggad som {user.email}</p>
+      <p>
+        <button type="button" onClick={onShowEmployees}>
+          Visa medarbetare
+        </button>
+      </p>
       <button type="button" onClick={logout}>
         Logga ut
       </button>
