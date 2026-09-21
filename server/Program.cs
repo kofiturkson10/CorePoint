@@ -1,7 +1,11 @@
+using Azure.Identity;
+using Azure.Storage.Blobs;
 using CompanyPortal.Api.Data;
 using CompanyPortal.Api.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
+using Scalar.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,6 +18,24 @@ builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 builder.Services.AddSingleton<IUserService, InMemoryUserService>();
+
+builder.Services.Configure<BlobStorageOptions>(builder.Configuration.GetSection(BlobStorageOptions.SectionName));
+
+// DefaultAzureCredential = managed identity when running in Azure, and your own login
+// (az login / Visual Studio) when running locally. No keys or connection strings in the code.
+// The factory runs the first time the client is needed, so the rest of the API works even if storage isn't configured yet.
+builder.Services.AddSingleton(serviceProvider =>
+{
+    var options = serviceProvider.GetRequiredService<IOptions<BlobStorageOptions>>().Value;
+    if (string.IsNullOrWhiteSpace(options.ServiceUri))
+    {
+        throw new InvalidOperationException("BlobStorage:ServiceUri is not configured.");
+    }
+
+    var containerUri = new Uri($"{options.ServiceUri.TrimEnd('/')}/{options.ContainerName}");
+    return new BlobContainerClient(containerUri, new DefaultAzureCredential());
+});
+builder.Services.AddSingleton<IDocumentService, BlobDocumentService>();
 
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
@@ -44,7 +66,8 @@ var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.MapOpenApi(); // the OpenAPI spec as JSON: /openapi/v1.json
+    app.MapScalarApiReference(); // the visual test UI, reads the spec above: /scalar
 }
 
 app.UseHttpsRedirection();
