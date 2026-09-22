@@ -108,4 +108,11 @@ public class BlobDocumentService : IDocumentService
             return null;
         }
     }
+
+    public async Task<bool> DeleteAsync(Guid id)
+    {
+        var blobClient = _containerClient.GetBlobClient(id.ToString("N"));
+        var response = await blobClient.DeleteIfExistsAsync();
+        return response.Value;
+    }
 }

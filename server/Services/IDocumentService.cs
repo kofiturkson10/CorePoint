@@ -16,4 +16,7 @@ public interface IDocumentService
 
     /// <summary>Returns the file, or null if no document with that id exists.</summary>
     Task<DocumentDownload?> DownloadAsync(Guid id);
+
+    /// <summary>Deletes the document. Returns false if no document with that id exists.</summary>
+    Task<bool> DeleteAsync(Guid id);
 }

@@ -68,4 +68,16 @@ public class DocumentsController : ControllerBase
         // instead of opening it, so an uploaded .html file is never run as a page on our domain.
         return File(download.Content, download.ContentType, download.FileName);
     }
+
+    [HttpDelete("{id:guid}")]
+    public async Task<IActionResult> DeleteAsync(Guid id)
+    {
+        var wasDeleted = await _documentService.DeleteAsync(id);
+        if (!wasDeleted)
+        {
+            return NotFound();
+        }
+
+        return NoContent();
+    }
 }

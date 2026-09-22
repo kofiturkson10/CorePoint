@@ -19,6 +19,7 @@ function DocumentListPage() {
   const [error, setError] = useState(null)
   const [isUploadFormOpen, setIsUploadFormOpen] = useState(false)
   const [downloadingId, setDownloadingId] = useState(null)
+  const [deletingId, setDeletingId] = useState(null)
 
   // Increasing this number makes the effect below fetch the list again
   const [reloadCount, setReloadCount] = useState(0)
@@ -47,6 +48,29 @@ function DocumentListPage() {
   function handleUploaded() {
     setIsUploadFormOpen(false)
     setReloadCount((count) => count + 1)
+  }
+
+  async function handleDelete(documentInfo) {
+    if (!window.confirm(`Ta bort ${documentInfo.fileName}?`)) {
+      return
+    }
+
+    setError(null)
+    setDeletingId(documentInfo.id)
+
+    try {
+      const response = await fetch(`/api/documents/${documentInfo.id}`, { method: 'DELETE' })
+      // 404 means it was already deleted elsewhere - the refresh below shows the real state
+      if (!response.ok && response.status !== 404) {
+        throw new Error(await readErrorMessage(response))
+      }
+
+      setReloadCount((count) => count + 1)
+    } catch (err) {
+      setError(err.message)
+    } finally {
+      setDeletingId(null)
+    }
   }
 
   // Downloads with fetch (not a plain link) so that errors such as an expired session
@@ -110,6 +134,7 @@ function DocumentListPage() {
               <th>Storlek</th>
               <th>Uppladdad av</th>
               <th>Uppladdad</th>
+              <th>Åtgärder</th>
             </tr>
           </thead>
           <tbody>
@@ -127,6 +152,15 @@ function DocumentListPage() {
                 <td>{formatFileSize(documentInfo.sizeBytes)}</td>
                 <td>{documentInfo.uploadedBy}</td>
                 <td>{new Date(documentInfo.uploadedAt).toLocaleString('sv-SE')}</td>
+                <td>
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(documentInfo)}
+                    disabled={deletingId === documentInfo.id}
+                  >
+                    Ta bort
+                  </button>
+                </td>
               </tr>
             ))}
           </tbody>
