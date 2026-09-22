@@ -14,8 +14,20 @@ builder.Services.AddControllers();
 
 builder.Services.AddOpenApi();
 
+// "Database:Provider" picks the EF Core provider: "Sqlite" (default, for local development)
+// or "SqlServer" (for Azure SQL Database). Same AppDbContext and model either way.
+var databaseProvider = builder.Configuration.GetValue("Database:Provider", "Sqlite");
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection")));
+{
+    if (string.Equals(databaseProvider, "SqlServer", StringComparison.OrdinalIgnoreCase))
+    {
+        options.UseSqlServer(builder.Configuration.GetConnectionString("SqlServerConnection"));
+    }
+    else
+    {
+        options.UseSqlite(builder.Configuration.GetConnectionString("DefaultConnection"));
+    }
+});
 
 builder.Services.AddSingleton<IUserService, InMemoryUserService>();
 

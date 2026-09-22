@@ -5,7 +5,9 @@ namespace CompanyPortal.Api.Data;
 
 public class AppDbContext : DbContext
 {
-    public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
+    // Non-generic DbContextOptions, not DbContextOptions<AppDbContext>, so that the
+    // SqlServerAppDbContext subclass below can pass its own options type through to this constructor.
+    public AppDbContext(DbContextOptions options) : base(options)
     {
     }
 
