@@ -19,4 +19,15 @@
     <PackageReference Include="Scalar.AspNetCore" Version="2.17.6" />
   </ItemGroup>
 
+  <!--
+    Zippar publish-output till server/publish.zip, redo för `az webapp deploy`.
+    Körs med ZipDirectory-tasken (körs inne i dotnet-processen, dvs. riktig .NET)
+    istället för i PowerShell, eftersom Windows PowerShell 5.1 kör på .NET Framework
+    vars ZipFile-implementation inte normaliserar sökvägsseparatorer till '/' -
+    det gav bakåtstreck i zip-postnamnen och kraschade Linux App Service-deployen.
+  -->
+  <Target Name="ZipPublishOutput" AfterTargets="Publish">
+    <ZipDirectory SourceDirectory="$(PublishDir)" DestinationFile="$(MSBuildProjectDirectory)\publish.zip" Overwrite="true" />
+  </Target>
+
 </Project>

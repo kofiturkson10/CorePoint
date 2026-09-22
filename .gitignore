@@ -485,3 +485,7 @@ $RECYCLE.BIN/
 *.db
 *.db-shm
 *.db-wal
+
+# Build artefakter för Azure App Service-deploy (genereras av server/publish.ps1)
+server/wwwroot/
+server/publish.zip
