@@ -76,11 +76,9 @@ builder.Services.AddAuthorization();
 
 var app = builder.Build();
 
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi(); // the OpenAPI spec as JSON: /openapi/v1.json
-    app.MapScalarApiReference(); // the visual test UI, reads the spec above: /scalar
-}
+
+app.MapOpenApi(); // the OpenAPI spec as JSON: /openapi/v1.json
+app.MapScalarApiReference(); // the visual test UI, reads the spec above: /scalar
 
 app.UseHttpsRedirection();
 
