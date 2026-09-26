@@ -14,6 +14,10 @@ builder.Services.AddControllers();
 
 builder.Services.AddOpenApi();
 
+// Reads APPLICATIONINSIGHTS_CONNECTION_STRING from configuration/environment automatically.
+// Empty locally (see appsettings.Development.json), set via App Service app settings in Azure.
+builder.Services.AddApplicationInsightsTelemetry();
+
 // "Database:Provider" picks the EF Core provider: "Sqlite" (default, for local development)
 // or "SqlServer" (for Azure SQL Database). Same AppDbContext and model either way.
 var databaseProvider = builder.Configuration.GetValue("Database:Provider", "Sqlite");
