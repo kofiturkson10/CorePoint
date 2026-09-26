@@ -1,9 +1,11 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
+import BookRoomPage from './BookRoomPage.jsx'
 import DashboardPage from './DashboardPage.jsx'
 import DocumentListPage from './DocumentListPage.jsx'
 import EmployeeListPage from './EmployeeListPage.jsx'
 import LoginRoute from './LoginRoute.jsx'
 import ManageLeaveRequestsPage from './ManageLeaveRequestsPage.jsx'
+import ManageRoomsPage from './ManageRoomsPage.jsx'
 import MyLeaveRequestsPage from './MyLeaveRequestsPage.jsx'
 import NewsListPage from './NewsListPage.jsx'
 import ProtectedRoute from './ProtectedRoute.jsx'
@@ -22,6 +24,9 @@ function App() {
         <Route path="/leave-requests" element={<MyLeaveRequestsPage />} />
         {/* Admin/HR only - ManageLeaveRequestsPage itself shows an access-denied message for other roles */}
         <Route path="/leave-requests/manage" element={<ManageLeaveRequestsPage />} />
+        <Route path="/bookings" element={<BookRoomPage />} />
+        {/* Admin only - ManageRoomsPage itself shows an access-denied message for other roles */}
+        <Route path="/rooms" element={<ManageRoomsPage />} />
       </Route>
 
       {/* "/" and any unknown address go to the dashboard (which redirects to /login if needed) */}

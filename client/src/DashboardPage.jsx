@@ -27,6 +27,14 @@ function DashboardPage() {
           <Link to="/leave-requests/manage">Hantera ansökningar</Link>
         </p>
       )}
+      <p>
+        <Link to="/bookings">Boka rum</Link>
+      </p>
+      {user.role === 'Admin' && (
+        <p>
+          <Link to="/rooms">Hantera rum</Link>
+        </p>
+      )}
       <button type="button" onClick={logout}>
         Logga ut
       </button>

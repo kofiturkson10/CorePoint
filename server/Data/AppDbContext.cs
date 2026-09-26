@@ -15,6 +15,8 @@ public class AppDbContext : DbContext
     public DbSet<Employee> Employees => Set<Employee>();
     public DbSet<News> News => Set<News>();
     public DbSet<LeaveRequest> LeaveRequests => Set<LeaveRequest>();
+    public DbSet<Room> Rooms => Set<Room>();
+    public DbSet<Booking> Bookings => Set<Booking>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -64,6 +66,34 @@ public class AppDbContext : DbContext
             // are the two common queries.
             entity.HasIndex(lr => lr.EmployeeId);
             entity.HasIndex(lr => lr.Status);
+        });
+
+        modelBuilder.Entity<Room>(entity =>
+        {
+            entity.Property(r => r.Name).IsRequired().HasMaxLength(100);
+            entity.Property(r => r.Location).HasMaxLength(200);
+        });
+
+        modelBuilder.Entity<Booking>(entity =>
+        {
+            // Same SQLite UTC issue as News.PublishedAt above.
+            entity.Property(b => b.StartTime)
+                .HasConversion(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+            entity.Property(b => b.EndTime)
+                .HasConversion(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+            entity.Property(b => b.CreatedAt)
+                .HasConversion(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+
+            // Restrict (not cascade): deleting a room with bookings is blocked in the
+            // controller with a friendly 409 before this constraint would ever fire.
+            entity.HasOne<Room>()
+                .WithMany()
+                .HasForeignKey(b => b.RoomId)
+                .OnDelete(DeleteBehavior.Restrict);
+
+            // The overlap check filters by RoomId, and "my bookings" filters by EmployeeId.
+            entity.HasIndex(b => b.RoomId);
+            entity.HasIndex(b => b.EmployeeId);
         });
     }
 }

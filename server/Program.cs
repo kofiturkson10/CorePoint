@@ -37,6 +37,7 @@ builder.Services.AddSingleton<IUserService, InMemoryUserService>();
 
 // Scoped, like AppDbContext itself (AddDbContext registers it as Scoped by default).
 builder.Services.AddScoped<ILeaveRequestService, LeaveRequestService>();
+builder.Services.AddScoped<IBookingService, BookingService>();
 
 builder.Services.Configure<BlobStorageOptions>(builder.Configuration.GetSection(BlobStorageOptions.SectionName));
 
