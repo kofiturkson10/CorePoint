@@ -62,7 +62,7 @@ jobs:
         run: dotnet build --configuration Release --no-restore
 
       - name: Run tests
-        run: dotnet tests server.Tests/CompanyPortal.Api.Tests.csproj --configuration Release --no-restore --verbosity normal
+        run: dotnet test server.Tests/CompanyPortal.Api.Tests.csproj --configuration Release --no-restore --verbosity normal
 
       - name: Publish (skapar även server/publish.zip via projektets ZipPublishOutput-target)
         working-directory: server
