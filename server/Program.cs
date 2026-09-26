@@ -35,6 +35,9 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 
 builder.Services.AddSingleton<IUserService, InMemoryUserService>();
 
+// Scoped, like AppDbContext itself (AddDbContext registers it as Scoped by default).
+builder.Services.AddScoped<ILeaveRequestService, LeaveRequestService>();
+
 builder.Services.Configure<BlobStorageOptions>(builder.Configuration.GetSection(BlobStorageOptions.SectionName));
 
 // DefaultAzureCredential = managed identity when running in Azure, and your own login

@@ -14,6 +14,7 @@ public class AppDbContext : DbContext
     // Each DbSet becomes a table in the database
     public DbSet<Employee> Employees => Set<Employee>();
     public DbSet<News> News => Set<News>();
+    public DbSet<LeaveRequest> LeaveRequests => Set<LeaveRequest>();
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -41,6 +42,28 @@ public class AppDbContext : DbContext
 
             // Two employees can't share an email address
             entity.HasIndex(e => e.Email).IsUnique();
+        });
+
+        modelBuilder.Entity<LeaveRequest>(entity =>
+        {
+            entity.Property(lr => lr.Reason).HasMaxLength(1000);
+
+            // Same SQLite UTC issue as News.PublishedAt above.
+            entity.Property(lr => lr.StartDate)
+                .HasConversion(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+            entity.Property(lr => lr.EndDate)
+                .HasConversion(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+            entity.Property(lr => lr.CreatedAt)
+                .HasConversion(v => v, v => DateTime.SpecifyKind(v, DateTimeKind.Utc));
+            entity.Property(lr => lr.ReviewedAt)
+                .HasConversion(
+                    v => v,
+                    v => v.HasValue ? DateTime.SpecifyKind(v.Value, DateTimeKind.Utc) : v);
+
+            // Looking up "my requests" (EmployeeId) and "pending requests to review" (Status)
+            // are the two common queries.
+            entity.HasIndex(lr => lr.EmployeeId);
+            entity.HasIndex(lr => lr.Status);
         });
     }
 }
