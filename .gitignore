@@ -489,3 +489,6 @@ $RECYCLE.BIN/
 # Build artefakter för Azure App Service-deploy (genereras av server/publish.ps1)
 server/wwwroot/
 server/publish.zip
+
+# Lokala inställningar
+appsettings.Development.json

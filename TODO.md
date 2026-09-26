@@ -4,4 +4,4 @@
 - [x] Modul 2: Anställdakatalog (CRUD)
 - [x] Modul 3: Nyheter/anslagstavla
 - [x] Modul 4: Dokumenthantering
-- [ ] Modul 5: Deploy till Azure
+- [x] Modul 5: Deploy till Azure
