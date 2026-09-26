@@ -27,8 +27,8 @@ public interface ILeaveRequestService
     /// <summary>Returns the given employee's own leave requests, newest first.</summary>
     Task<List<LeaveRequest>> GetMineAsync(int employeeId);
 
-    /// <summary>Returns every leave request, newest first.</summary>
-    Task<List<LeaveRequest>> GetAllAsync();
+    /// <summary>Returns every leave request, newest first, with the requester's email resolved in.</summary>
+    Task<List<LeaveRequestResponse>> GetAllAsync();
 
     /// <summary>Approves a pending leave request. Fails if it doesn't exist or was already reviewed.</summary>
     Task<LeaveRequestReviewResult> ApproveAsync(int id, int reviewerUserId);

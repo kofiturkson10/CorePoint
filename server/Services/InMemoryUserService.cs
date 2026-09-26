@@ -46,4 +46,10 @@ public class InMemoryUserService : IUserService
 
         return Task.FromResult(isValid ? user : null);
     }
+
+    public Task<User?> FindByIdAsync(int id)
+    {
+        var user = _users.FirstOrDefault(u => u.Id == id);
+        return Task.FromResult(user);
+    }
 }

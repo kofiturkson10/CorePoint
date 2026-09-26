@@ -91,8 +91,7 @@ function ManageLeaveRequestsPage() {
         <table>
           <thead>
             <tr>
-              {/* No name is shown: the API only exposes the applicant's user id, not a display name */}
-              <th>Sökande (användar-ID)</th>
+              <th>Sökande</th>
               <th>Startdatum</th>
               <th>Slutdatum</th>
               <th>Anledning</th>
@@ -105,7 +104,7 @@ function ManageLeaveRequestsPage() {
               const isPending = leaveRequest.status === LEAVE_REQUEST_STATUS.PENDING
               return (
                 <tr key={leaveRequest.id}>
-                  <td>{leaveRequest.employeeId}</td>
+                  <td>{leaveRequest.requesterEmail || '(okänd användare)'}</td>
                   <td>{new Date(leaveRequest.startDate).toLocaleDateString('sv-SE')}</td>
                   <td>{new Date(leaveRequest.endDate).toLocaleDateString('sv-SE')}</td>
                   <td>{leaveRequest.reason || '–'}</td>

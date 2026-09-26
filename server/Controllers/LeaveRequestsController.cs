@@ -42,7 +42,7 @@ public class LeaveRequestsController : ControllerBase
     // Only Admin/HR may see everyone's leave requests, so they can manage them.
     [Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.HR))]
     [HttpGet]
-    public async Task<ActionResult<List<LeaveRequest>>> GetAllAsync()
+    public async Task<ActionResult<List<LeaveRequestResponse>>> GetAllAsync()
     {
         var leaveRequests = await _leaveRequestService.GetAllAsync();
         return Ok(leaveRequests);

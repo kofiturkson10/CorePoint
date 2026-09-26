@@ -7,10 +7,12 @@ namespace CompanyPortal.Api.Services;
 public class LeaveRequestService : ILeaveRequestService
 {
     private readonly AppDbContext _dbContext;
+    private readonly IUserService _userService;
 
-    public LeaveRequestService(AppDbContext dbContext)
+    public LeaveRequestService(AppDbContext dbContext, IUserService userService)
     {
         _dbContext = dbContext;
+        _userService = userService;
     }
 
     public async Task<LeaveRequestCreateResult> CreateAsync(int employeeId, LeaveRequestCreateRequest request)
@@ -45,12 +47,36 @@ public class LeaveRequestService : ILeaveRequestService
             .ToListAsync();
     }
 
-    public async Task<List<LeaveRequest>> GetAllAsync()
+    public async Task<List<LeaveRequestResponse>> GetAllAsync()
     {
-        return await _dbContext.LeaveRequests
+        var leaveRequests = await _dbContext.LeaveRequests
             .AsNoTracking()
             .OrderByDescending(lr => lr.CreatedAt)
             .ToListAsync();
+
+        var responses = new List<LeaveRequestResponse>(leaveRequests.Count);
+        foreach (var leaveRequest in leaveRequests)
+        {
+            // EmployeeId is really the applicant's User.Id (see LeaveRequest.cs) - resolved here
+            // to an email for display. Left null if that user can no longer be found.
+            var requester = await _userService.FindByIdAsync(leaveRequest.EmployeeId);
+
+            responses.Add(new LeaveRequestResponse
+            {
+                Id = leaveRequest.Id,
+                EmployeeId = leaveRequest.EmployeeId,
+                RequesterEmail = requester?.Email,
+                StartDate = leaveRequest.StartDate,
+                EndDate = leaveRequest.EndDate,
+                Reason = leaveRequest.Reason,
+                Status = leaveRequest.Status,
+                CreatedAt = leaveRequest.CreatedAt,
+                ReviewedByUserId = leaveRequest.ReviewedByUserId,
+                ReviewedAt = leaveRequest.ReviewedAt
+            });
+        }
+
+        return responses;
     }
 
     public Task<LeaveRequestReviewResult> ApproveAsync(int id, int reviewerUserId) =>

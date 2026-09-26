@@ -89,6 +89,21 @@ public class LeaveRequestsTests : IClassFixture<TestingWebApplicationFactory>
         Assert.Equal(LeaveRequestStatus.Approved, approved!.Status);
     }
 
+    [Fact]
+    public async Task GetAll_AsAdmin_IncludesRequesterEmail()
+    {
+        await LoginAsync("demo@company.test");
+        var id = await CreateLeaveRequestAsync();
+
+        await LoginAsync("admin@company.test");
+        var response = await _client.GetAsync("/api/leaverequests");
+        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+
+        var all = await response.Content.ReadFromJsonAsync<List<LeaveRequestResponse>>(JsonOptions);
+        var created = Assert.Single(all!, lr => lr.Id == id);
+        Assert.Equal("demo@company.test", created.RequesterEmail);
+    }
+
     // Approving an already-handled request must fail cleanly (409), not throw or double-approve.
     [Fact]
     public async Task Approve_AlreadyApprovedRequest_ReturnsConflictInsteadOfCrashing()
