@@ -47,6 +47,7 @@ public class EmployeesController : ControllerBase
         return Ok(employee);
     }
 
+    [Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.HR))]
     [HttpPost]
     public async Task<ActionResult<Employee>> CreateAsync(EmployeeRequest request)
     {
@@ -69,6 +70,7 @@ public class EmployeesController : ControllerBase
         return CreatedAtRoute("GetEmployeeById", new { id = employee.Id }, employee);
     }
 
+    [Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.HR))]
     [HttpPut("{id:int}")]
     public async Task<ActionResult<Employee>> UpdateAsync(int id, EmployeeRequest request)
     {
@@ -94,6 +96,7 @@ public class EmployeesController : ControllerBase
         return Ok(employee);
     }
 
+    [Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.HR))]
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteAsync(int id)
     {

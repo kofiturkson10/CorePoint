@@ -29,6 +29,8 @@ public class DocumentsController : ControllerBase
 
     // multipart/form-data with a single field named "file".
     // The size limit is set a bit above the file limit to leave room for the multipart overhead.
+    // Documents aren't part of HR's Employees/News scope, so only Admin can write here.
+    [Authorize(Roles = nameof(UserRole.Admin))]
     [HttpPost]
     [RequestSizeLimit(MaxFileSizeBytes + 1024 * 1024)]
     public async Task<ActionResult<DocumentInfo>> UploadAsync(IFormFile file)
@@ -69,6 +71,7 @@ public class DocumentsController : ControllerBase
         return File(download.Content, download.ContentType, download.FileName);
     }
 
+    [Authorize(Roles = nameof(UserRole.Admin))]
     [HttpDelete("{id:guid}")]
     public async Task<IActionResult> DeleteAsync(Guid id)
     {

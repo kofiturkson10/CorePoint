@@ -11,15 +11,24 @@ public class InMemoryUserService : IUserService
 
     public InMemoryUserService()
     {
-        // Demo user for practice only - never hardcode credentials in a real app.
-        var demoUser = new User
+        // Demo users for practice only - never hardcode credentials in a real app.
+        // One user per role, so all three access levels can be tested locally.
+        AddDemoUser(1, "admin@company.test", "Admin User", UserRole.Admin);
+        AddDemoUser(2, "hr@company.test", "HR User", UserRole.HR);
+        AddDemoUser(3, "demo@company.test", "Demo User", UserRole.Employee);
+    }
+
+    private void AddDemoUser(int id, string email, string displayName, UserRole role)
+    {
+        var user = new User
         {
-            Id = 1,
-            Email = "demo@company.test",
-            DisplayName = "Demo User"
+            Id = id,
+            Email = email,
+            DisplayName = displayName,
+            Role = role
         };
-        demoUser.PasswordHash = _passwordHasher.HashPassword(demoUser, "Demo1234!");
-        _users.Add(demoUser);
+        user.PasswordHash = _passwordHasher.HashPassword(user, "Demo1234!");
+        _users.Add(user);
     }
 
     public Task<User?> ValidateCredentialsAsync(string email, string password)

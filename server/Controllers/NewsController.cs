@@ -46,6 +46,7 @@ public class NewsController : ControllerBase
         return Ok(news);
     }
 
+    [Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.HR))]
     [HttpPost]
     public async Task<ActionResult<News>> CreateAsync(NewsRequest request)
     {
@@ -64,6 +65,7 @@ public class NewsController : ControllerBase
         return CreatedAtRoute("GetNewsById", new { id = news.Id }, news);
     }
 
+    [Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.HR))]
     [HttpPut("{id:int}")]
     public async Task<ActionResult<News>> UpdateAsync(int id, NewsRequest request)
     {
@@ -86,6 +88,7 @@ public class NewsController : ControllerBase
         return Ok(news);
     }
 
+    [Authorize(Roles = nameof(UserRole.Admin) + "," + nameof(UserRole.HR))]
     [HttpDelete("{id:int}")]
     public async Task<IActionResult> DeleteAsync(int id)
     {

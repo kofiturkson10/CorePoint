@@ -34,7 +34,8 @@ public class AuthController : ControllerBase
         {
             new(ClaimTypes.NameIdentifier, user.Id.ToString()),
             new(ClaimTypes.Email, user.Email),
-            new(ClaimTypes.Name, user.DisplayName)
+            new(ClaimTypes.Name, user.DisplayName),
+            new(ClaimTypes.Role, user.Role.ToString())
         };
         var identity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
         var principal = new ClaimsPrincipal(identity);
@@ -42,7 +43,7 @@ public class AuthController : ControllerBase
         // Creates the encrypted auth cookie and adds it to the response as Set-Cookie.
         await HttpContext.SignInAsync(CookieAuthenticationDefaults.AuthenticationScheme, principal);
 
-        return Ok(new { user.Email, user.DisplayName });
+        return Ok(new { user.Email, user.DisplayName, Role = user.Role.ToString() });
     }
 
     [HttpPost("logout")]
@@ -60,7 +61,8 @@ public class AuthController : ControllerBase
         return Ok(new
         {
             Email = User.FindFirstValue(ClaimTypes.Email),
-            DisplayName = User.FindFirstValue(ClaimTypes.Name)
+            DisplayName = User.FindFirstValue(ClaimTypes.Name),
+            Role = User.FindFirstValue(ClaimTypes.Role)
         });
     }
 }
