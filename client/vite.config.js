@@ -9,7 +9,7 @@ export default defineConfig({
     // Uses the https profile (the auth cookie is Secure); secure: false accepts the dev certificate.
     proxy: {
       '/api': {
-        target: 'https://localhost:7073',
+        target: 'http://localhost:5042',
         secure: false,
       },
     },

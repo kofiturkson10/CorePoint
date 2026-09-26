@@ -19,6 +19,14 @@ function DashboardPage() {
       <p>
         <Link to="/documents">Visa dokument</Link>
       </p>
+      <p>
+        <Link to="/leave-requests">Mina ansökningar</Link>
+      </p>
+      {(user.role === 'Admin' || user.role === 'HR') && (
+        <p>
+          <Link to="/leave-requests/manage">Hantera ansökningar</Link>
+        </p>
+      )}
       <button type="button" onClick={logout}>
         Logga ut
       </button>
