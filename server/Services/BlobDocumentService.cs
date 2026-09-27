@@ -44,7 +44,7 @@ public class BlobDocumentService : IDocumentService
         return new DocumentInfo(id, fileName, contentType, sizeBytes, uploadedBy, uploadedAt);
     }
 
-    public async Task<List<DocumentInfo>> ListAsync()
+    public async Task<PagedResult<DocumentInfo>> ListAsync(string? search, int page, int pageSize)
     {
         var documents = new List<DocumentInfo>();
 
@@ -84,8 +84,24 @@ public class BlobDocumentService : IDocumentService
                 uploadedAt));
         }
 
+        // There's no database to filter/page in, so it happens here, after listing every
+        // blob - Azure Blob Storage has no server-side "WHERE name contains ..." to push this to.
+        IEnumerable<DocumentInfo> filtered = documents;
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            filtered = filtered.Where(d => d.FileName.Contains(search, StringComparison.OrdinalIgnoreCase));
+        }
+
         // Azure lists blobs by name (random ids), so sort them here
-        return documents.OrderByDescending(document => document.UploadedAt).ToList();
+        var ordered = filtered.OrderByDescending(document => document.UploadedAt).ToList();
+        var totalCount = ordered.Count;
+
+        var pageItems = ordered
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
+            .ToList();
+
+        return PagedResult<DocumentInfo>.Create(pageItems, totalCount, page, pageSize);
     }
 
     public async Task<DocumentDownload?> DownloadAsync(Guid id)

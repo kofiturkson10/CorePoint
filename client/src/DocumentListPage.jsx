@@ -15,25 +15,37 @@ function formatFileSize(bytes) {
 
 function DocumentListPage() {
   const [documents, setDocuments] = useState([])
+  const [totalPages, setTotalPages] = useState(1)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
   const [isUploadFormOpen, setIsUploadFormOpen] = useState(false)
   const [downloadingId, setDownloadingId] = useState(null)
   const [deletingId, setDeletingId] = useState(null)
 
+  const [search, setSearch] = useState('')
+  const [page, setPage] = useState(1)
+
   // Increasing this number makes the effect below fetch the list again
   const [reloadCount, setReloadCount] = useState(0)
 
-  // Fetches the list on page load and again after every upload (reloadCount),
+  // Fetches the current page on load and again after every change (search, page, reloadCount),
   // so the page always shows what is really in storage.
   useEffect(() => {
     async function fetchDocuments() {
+      setIsLoading(true)
       try {
-        const response = await fetch('/api/documents')
+        const params = new URLSearchParams({ page: String(page), pageSize: '10' })
+        if (search) {
+          params.set('search', search)
+        }
+
+        const response = await fetch(`/api/documents?${params}`)
         if (!response.ok) {
           throw new Error(await readErrorMessage(response))
         }
-        setDocuments(await response.json())
+        const data = await response.json()
+        setDocuments(data.items)
+        setTotalPages(data.totalPages)
         setError(null)
       } catch (err) {
         setError(err.message)
@@ -43,7 +55,12 @@ function DocumentListPage() {
     }
 
     fetchDocuments()
-  }, [reloadCount])
+  }, [search, page, reloadCount])
+
+  function handleSearchChange(value) {
+    setSearch(value)
+    setPage(1) // a new search may have far fewer pages, so start over at page 1
+  }
 
   function handleUploaded() {
     setIsUploadFormOpen(false)
@@ -109,6 +126,19 @@ function DocumentListPage() {
         <Link to="/dashboard">Tillbaka till dashboarden</Link>
       </p>
 
+      <p>
+        <label>
+          Sök
+          <br />
+          <input
+            type="search"
+            value={search}
+            onChange={(event) => handleSearchChange(event.target.value)}
+            placeholder="Filnamn"
+          />
+        </label>
+      </p>
+
       {isUploadFormOpen ? (
         <DocumentUploadForm
           onUploaded={handleUploaded}
@@ -165,6 +195,22 @@ function DocumentListPage() {
             ))}
           </tbody>
         </table>
+      )}
+
+      {totalPages > 1 && (
+        <p>
+          <button type="button" onClick={() => setPage((p) => p - 1)} disabled={page <= 1}>
+            Föregående
+          </button>{' '}
+          Sida {page} av {totalPages}{' '}
+          <button
+            type="button"
+            onClick={() => setPage((p) => p + 1)}
+            disabled={page >= totalPages}
+          >
+            Nästa
+          </button>
+        </p>
       )}
     </main>
   )

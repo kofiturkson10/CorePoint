@@ -11,8 +11,11 @@ public interface IDocumentService
     /// <summary>Stores the file in blob storage under a new id and returns information about it.</summary>
     Task<DocumentInfo> UploadAsync(Stream content, string fileName, string contentType, long sizeBytes, string uploadedBy);
 
-    /// <summary>Returns information about all documents, newest first. The file contents are not downloaded.</summary>
-    Task<List<DocumentInfo>> ListAsync();
+    /// <summary>
+    /// Returns a page of documents matching the search text (if any), newest first.
+    /// The file contents are not downloaded.
+    /// </summary>
+    Task<PagedResult<DocumentInfo>> ListAsync(string? search, int page, int pageSize);
 
     /// <summary>Returns the file, or null if no document with that id exists.</summary>
     Task<DocumentDownload?> DownloadAsync(Guid id);

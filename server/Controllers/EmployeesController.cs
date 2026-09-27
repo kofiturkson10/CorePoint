@@ -19,15 +19,32 @@ public class EmployeesController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<Employee>>> GetAllAsync()
+    public async Task<ActionResult<PagedResult<Employee>>> GetAllAsync(string? search, int page = 1, int pageSize = 10)
     {
-        // AsNoTracking: we only read, so EF doesn't need to track changes (faster)
-        var employees = await _dbContext.Employees
-            .AsNoTracking()
-            .OrderBy(e => e.Name)
+        (page, pageSize) = PagingDefaults.Normalize(page, pageSize);
+
+        // AsNoTracking: we only read, so EF doesn't need to track changes (faster).
+        // Built up step by step and only sent to the database once, at the end.
+        IQueryable<Employee> query = _dbContext.Employees.AsNoTracking();
+
+        if (!string.IsNullOrWhiteSpace(search))
+        {
+            var normalizedSearch = search.Trim().ToLower();
+            query = query.Where(e =>
+                e.Name.ToLower().Contains(normalizedSearch) ||
+                e.Department.ToLower().Contains(normalizedSearch) ||
+                e.Email.ToLower().Contains(normalizedSearch));
+        }
+
+        query = query.OrderBy(e => e.Name);
+
+        var totalCount = await query.CountAsync();
+        var employees = await query
+            .Skip((page - 1) * pageSize)
+            .Take(pageSize)
             .ToListAsync();
 
-        return Ok(employees);
+        return Ok(PagedResult<Employee>.Create(employees, totalCount, page, pageSize));
     }
 
     // The route Name lets CreateAsync build the Location header. ASP.NET Core strips the

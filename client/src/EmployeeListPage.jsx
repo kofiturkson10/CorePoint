@@ -5,25 +5,37 @@ import EmployeeForm from './EmployeeForm.jsx'
 
 function EmployeeListPage() {
   const [employees, setEmployees] = useState([])
+  const [totalPages, setTotalPages] = useState(1)
   const [isLoading, setIsLoading] = useState(true)
   const [error, setError] = useState(null)
   // What the form is showing: null = hidden, 'new' = create, otherwise the employee being edited
   const [formTarget, setFormTarget] = useState(null)
   const [deletingId, setDeletingId] = useState(null)
 
+  const [search, setSearch] = useState('')
+  const [page, setPage] = useState(1)
+
   // Increasing this number makes the effect below fetch the list again
   const [reloadCount, setReloadCount] = useState(0)
 
-  // Fetches the list on page load and again after every change (reloadCount),
+  // Fetches the current page on load and again after every change (search, page, reloadCount),
   // so the table always shows what is really in the database.
   useEffect(() => {
     async function fetchEmployees() {
+      setIsLoading(true)
       try {
-        const response = await fetch('/api/employees')
+        const params = new URLSearchParams({ page: String(page), pageSize: '10' })
+        if (search) {
+          params.set('search', search)
+        }
+
+        const response = await fetch(`/api/employees?${params}`)
         if (!response.ok) {
           throw new Error(await readErrorMessage(response))
         }
-        setEmployees(await response.json())
+        const data = await response.json()
+        setEmployees(data.items)
+        setTotalPages(data.totalPages)
         setError(null)
       } catch (err) {
         setError(err.message)
@@ -33,10 +45,15 @@ function EmployeeListPage() {
     }
 
     fetchEmployees()
-  }, [reloadCount])
+  }, [search, page, reloadCount])
 
   function reloadEmployees() {
     setReloadCount((count) => count + 1)
+  }
+
+  function handleSearchChange(value) {
+    setSearch(value)
+    setPage(1) // a new search may have far fewer pages, so start over at page 1
   }
 
   function handleSaved() {
@@ -76,6 +93,19 @@ function EmployeeListPage() {
       <h2>Medarbetare</h2>
       <p>
         <Link to="/dashboard">Tillbaka till dashboarden</Link>
+      </p>
+
+      <p>
+        <label>
+          Sök
+          <br />
+          <input
+            type="search"
+            value={search}
+            onChange={(event) => handleSearchChange(event.target.value)}
+            placeholder="Namn, avdelning eller e-post"
+          />
+        </label>
       </p>
 
       {formTarget === null ? (
@@ -132,6 +162,22 @@ function EmployeeListPage() {
             ))}
           </tbody>
         </table>
+      )}
+
+      {totalPages > 1 && (
+        <p>
+          <button type="button" onClick={() => setPage((p) => p - 1)} disabled={page <= 1}>
+            Föregående
+          </button>{' '}
+          Sida {page} av {totalPages}{' '}
+          <button
+            type="button"
+            onClick={() => setPage((p) => p + 1)}
+            disabled={page >= totalPages}
+          >
+            Nästa
+          </button>
+        </p>
       )}
     </main>
   )

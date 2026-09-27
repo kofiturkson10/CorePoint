@@ -21,9 +21,11 @@ public class DocumentsController : ControllerBase
     }
 
     [HttpGet]
-    public async Task<ActionResult<List<DocumentInfo>>> GetAllAsync()
+    public async Task<ActionResult<PagedResult<DocumentInfo>>> GetAllAsync(string? search, int page = 1, int pageSize = 10)
     {
-        var documents = await _documentService.ListAsync();
+        (page, pageSize) = PagingDefaults.Normalize(page, pageSize);
+
+        var documents = await _documentService.ListAsync(search, page, pageSize);
         return Ok(documents);
     }
 
