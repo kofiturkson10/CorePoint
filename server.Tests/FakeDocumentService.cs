@@ -5,27 +5,26 @@ using CompanyPortal.Api.Services;
 namespace CompanyPortal.Api.Tests;
 
 // In-memory stand-in for BlobDocumentService, used only in tests - there's no real Azure
-// Blob Storage to talk to here. Implements the same search/paging contract as
-// BlobDocumentService, just backed by a dictionary instead of a blob container.
+// Blob Storage to talk to here. Implements the same search/paging/download-url contract as
+// BlobDocumentService, just backed by a dictionary instead of a blob container. File content
+// is discarded rather than stored, since nothing in the contract reads it back anymore -
+// downloads now return a URL, not the bytes themselves.
 public class FakeDocumentService : IDocumentService
 {
-    private readonly ConcurrentDictionary<Guid, (DocumentInfo Info, byte[] Content)> _documents = new();
+    private readonly ConcurrentDictionary<Guid, DocumentInfo> _documents = new();
 
-    public async Task<DocumentInfo> UploadAsync(Stream content, string fileName, string contentType, long sizeBytes, string uploadedBy)
+    public Task<DocumentInfo> UploadAsync(Stream content, string fileName, string contentType, long sizeBytes, string uploadedBy)
     {
         var id = Guid.NewGuid();
-        using var memoryStream = new MemoryStream();
-        await content.CopyToAsync(memoryStream);
-
         var info = new DocumentInfo(id, fileName, contentType, sizeBytes, uploadedBy, DateTime.UtcNow);
-        _documents[id] = (info, memoryStream.ToArray());
+        _documents[id] = info;
 
-        return info;
+        return Task.FromResult(info);
     }
 
     public Task<PagedResult<DocumentInfo>> ListAsync(string? search, int page, int pageSize)
     {
-        IEnumerable<DocumentInfo> documents = _documents.Values.Select(d => d.Info);
+        IEnumerable<DocumentInfo> documents = _documents.Values;
 
         if (!string.IsNullOrWhiteSpace(search))
         {
@@ -43,15 +42,17 @@ public class FakeDocumentService : IDocumentService
         return Task.FromResult(PagedResult<DocumentInfo>.Create(pageItems, totalCount, page, pageSize));
     }
 
-    public Task<DocumentDownload?> DownloadAsync(Guid id)
+    public Task<string?> GetDownloadUrlAsync(Guid id)
     {
         if (!_documents.TryGetValue(id, out var entry))
         {
-            return Task.FromResult<DocumentDownload?>(null);
+            return Task.FromResult<string?>(null);
         }
 
-        Stream stream = new MemoryStream(entry.Content);
-        return Task.FromResult<DocumentDownload?>(new DocumentDownload(stream, entry.Info.ContentType, entry.Info.FileName));
+        // A stand-in for a real Azure user delegation SAS URL - there's no real Blob Storage
+        // here, so this just needs to look like a URL for the controller/client contract to hold.
+        var fakeUrl = $"https://fake-blob-storage.test/{id:N}?sas=fake&filename={Uri.EscapeDataString(entry.FileName)}";
+        return Task.FromResult<string?>(fakeUrl);
     }
 
     public Task<bool> DeleteAsync(Guid id)

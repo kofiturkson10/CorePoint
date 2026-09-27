@@ -2,10 +2,6 @@ using CompanyPortal.Api.Models;
 
 namespace CompanyPortal.Api.Services;
 
-// The file content plus what the browser needs to save it under the right name.
-// The caller must dispose the stream (returning it with File(...) in a controller does that).
-public record DocumentDownload(Stream Content, string ContentType, string FileName);
-
 public interface IDocumentService
 {
     /// <summary>Stores the file in blob storage under a new id and returns information about it.</summary>
@@ -17,8 +13,12 @@ public interface IDocumentService
     /// </summary>
     Task<PagedResult<DocumentInfo>> ListAsync(string? search, int page, int pageSize);
 
-    /// <summary>Returns the file, or null if no document with that id exists.</summary>
-    Task<DocumentDownload?> DownloadAsync(Guid id);
+    /// <summary>
+    /// Returns a short-lived, read-only download URL (a user delegation SAS) for the document,
+    /// or null if no document with that id exists. The client downloads the file directly from
+    /// Blob Storage using this URL - the file no longer passes through the API.
+    /// </summary>
+    Task<string?> GetDownloadUrlAsync(Guid id);
 
     /// <summary>Deletes the document. Returns false if no document with that id exists.</summary>
     Task<bool> DeleteAsync(Guid id);

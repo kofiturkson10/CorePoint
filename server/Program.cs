@@ -45,7 +45,8 @@ builder.Services.Configure<BlobStorageOptions>(builder.Configuration.GetSection(
 
 // DefaultAzureCredential = managed identity when running in Azure, and your own login
 // (az login / Visual Studio) when running locally. No keys or connection strings in the code.
-// The factory runs the first time the client is needed, so the rest of the API works even if storage isn't configured yet.
+// The factories run the first time a client is needed, so the rest of the API works even if
+// storage isn't configured yet.
 builder.Services.AddSingleton(serviceProvider =>
 {
     var options = serviceProvider.GetRequiredService<IOptions<BlobStorageOptions>>().Value;
@@ -54,8 +55,13 @@ builder.Services.AddSingleton(serviceProvider =>
         throw new InvalidOperationException("BlobStorage:ServiceUri is not configured.");
     }
 
-    var containerUri = new Uri($"{options.ServiceUri.TrimEnd('/')}/{options.ContainerName}");
-    return new BlobContainerClient(containerUri, new DefaultAzureCredential());
+    return new BlobServiceClient(new Uri(options.ServiceUri), new DefaultAzureCredential());
+});
+builder.Services.AddSingleton(serviceProvider =>
+{
+    var options = serviceProvider.GetRequiredService<IOptions<BlobStorageOptions>>().Value;
+    var serviceClient = serviceProvider.GetRequiredService<BlobServiceClient>();
+    return serviceClient.GetBlobContainerClient(options.ContainerName);
 });
 builder.Services.AddSingleton<IDocumentService, BlobDocumentService>();
 

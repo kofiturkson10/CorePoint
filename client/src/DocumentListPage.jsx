@@ -90,8 +90,9 @@ function DocumentListPage() {
     }
   }
 
-  // Downloads with fetch (not a plain link) so that errors such as an expired session
-  // or a file that no longer exists can be shown on the page.
+  // Fetches a short-lived download link first (not a plain <a href>) so that errors such as
+  // an expired session or a file that no longer exists can be shown on the page. The actual
+  // file then comes straight from Blob Storage, not through the API.
   async function handleDownload(documentInfo) {
     setError(null)
     setDownloadingId(documentInfo.id)
@@ -102,15 +103,10 @@ function DocumentListPage() {
         throw new Error(await readErrorMessage(response))
       }
 
-      // Put the file in a temporary in-memory URL and click a hidden link to it,
-      // which makes the browser save the file under its original name.
-      const blob = await response.blob()
-      const url = URL.createObjectURL(blob)
-      const link = document.createElement('a')
-      link.href = url
-      link.download = documentInfo.fileName
-      link.click()
-      URL.revokeObjectURL(url)
+      const { downloadUrl } = await response.json()
+      // The link's Content-Disposition (set by the API) makes the browser save the file
+      // under its original name instead of navigating away from the page.
+      window.location.assign(downloadUrl)
     } catch (err) {
       setError(err.message)
     } finally {

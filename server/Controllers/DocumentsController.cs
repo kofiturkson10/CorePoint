@@ -59,18 +59,20 @@ public class DocumentsController : ControllerBase
         return CreatedAtRoute("DownloadDocument", new { id = document.Id }, document);
     }
 
+    // Returns a short-lived download link instead of the file itself - the client fetches the
+    // actual bytes directly from Blob Storage using this URL, not through the API. Still
+    // requires login to obtain (class-level [Authorize] above), same as before; only the URL
+    // itself, which expires in a few minutes, needs no further authentication once issued.
     [HttpGet("{id:guid}", Name = "DownloadDocument")]
-    public async Task<IActionResult> DownloadAsync(Guid id)
+    public async Task<ActionResult<object>> GetDownloadUrlAsync(Guid id)
     {
-        var download = await _documentService.DownloadAsync(id);
-        if (download is null)
+        var downloadUrl = await _documentService.GetDownloadUrlAsync(id);
+        if (downloadUrl is null)
         {
             return NotFound();
         }
 
-        // Giving a file name makes the browser save the file (Content-Disposition: attachment)
-        // instead of opening it, so an uploaded .html file is never run as a page on our domain.
-        return File(download.Content, download.ContentType, download.FileName);
+        return Ok(new { downloadUrl });
     }
 
     [Authorize(Roles = nameof(UserRole.Admin))]

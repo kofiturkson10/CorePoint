@@ -1,6 +1,7 @@
 using Azure;
 using Azure.Storage.Blobs;
 using Azure.Storage.Blobs.Models;
+using Azure.Storage.Sas;
 using CompanyPortal.Api.Models;
 
 namespace CompanyPortal.Api.Services;
@@ -11,11 +12,16 @@ public class BlobDocumentService : IDocumentService
     private const string UploadedByMetadataKey = "uploadedBy";
     private const string UploadedAtMetadataKey = "uploadedAt";
 
-    private readonly BlobContainerClient _containerClient;
+    // Short enough that a leaked/logged URL stops working quickly, long enough for a real download.
+    private const int SasExpiryMinutes = 15;
 
-    public BlobDocumentService(BlobContainerClient containerClient)
+    private readonly BlobContainerClient _containerClient;
+    private readonly BlobServiceClient _serviceClient;
+
+    public BlobDocumentService(BlobContainerClient containerClient, BlobServiceClient serviceClient)
     {
         _containerClient = containerClient;
+        _serviceClient = serviceClient;
     }
 
     public async Task<DocumentInfo> UploadAsync(Stream content, string fileName, string contentType, long sizeBytes, string uploadedBy)
@@ -104,25 +110,51 @@ public class BlobDocumentService : IDocumentService
         return PagedResult<DocumentInfo>.Create(pageItems, totalCount, page, pageSize);
     }
 
-    public async Task<DocumentDownload?> DownloadAsync(Guid id)
+    public async Task<string?> GetDownloadUrlAsync(Guid id)
     {
         var blobClient = _containerClient.GetBlobClient(id.ToString("N"));
 
+        BlobProperties properties;
         try
         {
-            // Streaming: the file is passed on to the client piece by piece instead of being loaded into memory.
-            BlobDownloadStreamingResult result = await blobClient.DownloadStreamingAsync();
-
-            var fileName = result.Details.Metadata.TryGetValue(FileNameMetadataKey, out var storedName)
-                ? Uri.UnescapeDataString(storedName)
-                : id.ToString("N");
-
-            return new DocumentDownload(result.Content, result.Details.ContentType, fileName);
+            // Confirms the blob exists and gets its metadata, without downloading any content.
+            properties = await blobClient.GetPropertiesAsync();
         }
         catch (RequestFailedException ex) when (ex.Status == StatusCodes.Status404NotFound)
         {
             return null;
         }
+
+        var fileName = properties.Metadata.TryGetValue(FileNameMetadataKey, out var storedName)
+            ? Uri.UnescapeDataString(storedName)
+            : id.ToString("N");
+
+        var expiresOn = DateTimeOffset.UtcNow.AddMinutes(SasExpiryMinutes);
+
+        // Requires the "Storage Blob Delegator" role on the storage account (in addition to the
+        // read/write role already used for upload/list/delete) - that's what lets the app's
+        // managed identity ask for a user delegation key without ever holding an account key.
+        var userDelegationKey = await _serviceClient.GetUserDelegationKeyAsync(
+            new BlobGetUserDelegationKeyOptions(expiresOn) { StartsOn = DateTimeOffset.UtcNow });
+
+        var sasBuilder = new BlobSasBuilder
+        {
+            BlobContainerName = _containerClient.Name,
+            BlobName = blobClient.Name,
+            Resource = "b", // "b" = a single blob, as opposed to "c" for the whole container
+            ExpiresOn = expiresOn,
+            Protocol = SasProtocol.Https,
+            // Makes the browser save the file under its original name instead of opening it
+            // inline on Blob Storage's own domain - the same reason the old File(...) result
+            // in the controller set a file name. Quotes are stripped so they can't break the header.
+            ContentDisposition = $"attachment; filename=\"{fileName.Replace("\"", "")}\""
+        };
+        sasBuilder.SetPermissions(BlobSasPermissions.Read);
+
+        var sasQueryParameters = sasBuilder.ToSasQueryParameters(userDelegationKey, _serviceClient.AccountName);
+
+        var uriBuilder = new BlobUriBuilder(blobClient.Uri) { Sas = sasQueryParameters };
+        return uriBuilder.ToUri().ToString();
     }
 
     public async Task<bool> DeleteAsync(Guid id)
