@@ -2,7 +2,7 @@
 # The auth cookie is Secure, so auth requests must use https (run with: dotnet run --launch-profile https)
 @CompanyPortal.Api_HttpsAddress = https://localhost:7073
 
-GET {{CompanyPortal.Api_HostAddress}}/api/health
+GET {{CompanyPortal.Api_HostAddress}}/health
 Accept: application/json
 
 ###

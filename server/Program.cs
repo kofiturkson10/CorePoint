@@ -1,8 +1,10 @@
 using Azure.Identity;
 using Azure.Storage.Blobs;
 using CompanyPortal.Api.Data;
+using CompanyPortal.Api.HealthChecks;
 using CompanyPortal.Api.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Scalar.AspNetCore;
@@ -82,6 +84,14 @@ builder.Services
     });
 builder.Services.AddAuthorization();
 
+// Only a database check for now: BlobContainerClient is built lazily by a factory that throws
+// if BlobStorage:ServiceUri isn't configured (true for the test environment, and for local dev
+// unless Azure Storage is set up), and even when it is, a health check would need a real Azure
+// call via DefaultAzureCredential - not something the test environment or offline local dev can
+// answer reliably. Skipped rather than making this endpoint flaky.
+builder.Services.AddHealthChecks()
+    .AddCheck<DatabaseHealthCheck>("database", tags: ["database"]);
+
 var app = builder.Build();
 
 
@@ -94,6 +104,13 @@ app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllers();
+
+// No [Authorize] here (MapHealthChecks endpoints aren't covered by UseAuthorization unless
+// asked to be), so Azure App Service can reach it anonymously, same as before.
+app.MapHealthChecks("/health", new HealthCheckOptions
+{
+    ResponseWriter = HealthCheckResponseWriter.WriteAsync
+});
 
 app.UseStaticFiles();
 app.MapFallbackToFile("index.html");

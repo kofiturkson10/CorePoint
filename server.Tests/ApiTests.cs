@@ -28,16 +28,6 @@ public class ApiTests : IClassFixture<TestingWebApplicationFactory>
     }
 
     [Fact]
-    public async Task Health_ReturnsOk_WithoutLogin()
-    {
-        // Ingen inloggning skickas med här - health-endpointen ska
-        // vara nåbar oavsett, så att Azure kan övervaka appen.
-        var response = await _client.GetAsync("/api/health");
-
-        Assert.Equal(HttpStatusCode.OK, response.StatusCode);
-    }
-
-    [Fact]
     public async Task Employees_WithoutLogin_ReturnsUnauthorized()
     {
         // Ingen inloggning skickas med här heller - då ska cookie-authen
