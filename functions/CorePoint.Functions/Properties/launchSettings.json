@@ -1,0 +1,9 @@
+{
+  "profiles": {
+    "CorePoint_Functions": {
+      "commandName": "Project",
+      "commandLineArgs": "--port 7177",
+      "launchBrowser": false
+    }
+  }
+}

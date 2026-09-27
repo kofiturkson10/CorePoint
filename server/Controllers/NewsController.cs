@@ -1,6 +1,7 @@
 using System.Security.Claims;
 using CompanyPortal.Api.Data;
 using CompanyPortal.Api.Models;
+using CompanyPortal.Api.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
@@ -13,10 +14,12 @@ namespace CompanyPortal.Api.Controllers;
 public class NewsController : ControllerBase
 {
     private readonly AppDbContext _dbContext;
+    private readonly INewsNotificationQueue _newsNotificationQueue;
 
-    public NewsController(AppDbContext dbContext)
+    public NewsController(AppDbContext dbContext, INewsNotificationQueue newsNotificationQueue)
     {
         _dbContext = dbContext;
+        _newsNotificationQueue = newsNotificationQueue;
     }
 
     [HttpGet]
@@ -61,6 +64,10 @@ public class NewsController : ControllerBase
 
         _dbContext.News.Add(news);
         await _dbContext.SaveChangesAsync();
+
+        // A queue notification is a bonus, not a critical part of publishing - see
+        // QueueNewsNotificationService for why this can never fail this request.
+        await _newsNotificationQueue.NotifyPublishedAsync(news);
 
         return CreatedAtRoute("GetNewsById", new { id = news.Id }, news);
     }

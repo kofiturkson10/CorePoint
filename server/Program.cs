@@ -1,5 +1,6 @@
 using Azure.Identity;
 using Azure.Storage.Blobs;
+using Azure.Storage.Queues;
 using CompanyPortal.Api.Data;
 using CompanyPortal.Api.HealthChecks;
 using CompanyPortal.Api.Services;
@@ -64,6 +65,28 @@ builder.Services.AddSingleton(serviceProvider =>
     return serviceClient.GetBlobContainerClient(options.ContainerName);
 });
 builder.Services.AddSingleton<IDocumentService, BlobDocumentService>();
+
+builder.Services.Configure<QueueStorageOptions>(builder.Configuration.GetSection(QueueStorageOptions.SectionName));
+
+// Unlike BlobServiceClient above, this is allowed to be null: Documents can't function at all
+// without Blob Storage, but a news item can still be created just fine without a working
+// notifications queue - see QueueNewsNotificationService, which treats a null QueueClient as
+// "notifications are disabled" instead of crashing. Empty locally (see
+// appsettings.Development.json) so local development never needs a queue connection.
+// Registered via the non-generic Type overload (AddSingleton<QueueClient?> isn't allowed -
+// AddSingleton<TService>'s "class" constraint rejects a nullable-annotated type argument).
+builder.Services.AddSingleton(typeof(QueueClient), serviceProvider =>
+{
+    var options = serviceProvider.GetRequiredService<IOptions<QueueStorageOptions>>().Value;
+    if (string.IsNullOrWhiteSpace(options.ServiceUri))
+    {
+        return null!;
+    }
+
+    var queueServiceClient = new QueueServiceClient(new Uri(options.ServiceUri), new DefaultAzureCredential());
+    return queueServiceClient.GetQueueClient(options.QueueName);
+});
+builder.Services.AddSingleton<INewsNotificationQueue, QueueNewsNotificationService>();
 
 builder.Services
     .AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)

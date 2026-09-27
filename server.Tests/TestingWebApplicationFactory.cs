@@ -12,8 +12,9 @@ namespace CompanyPortal.Api.Tests;
 // Byter ut den riktiga SQLite-filen (companyportal.db, med Data:Source i appsettings.json)
 // mot en tom databas i minnet, så testerna aldrig läser eller skriver i databasen som
 // används när man kör appen lokalt, och alltid startar från ett känt, tomt schema.
-// Byter också ut den Azure Blob Storage-baserade dokumenttjänsten mot en tjänst i minnet,
-// eftersom det inte finns någon riktig Azure-anslutning tillgänglig i testerna.
+// Byter också ut den Azure Blob Storage-baserade dokumenttjänsten och den Azure Storage
+// Queue-baserade nyhetsnotifieringen mot tjänster i minnet, eftersom det inte finns någon
+// riktig Azure-anslutning tillgänglig i testerna.
 public class TestingWebApplicationFactory : WebApplicationFactory<Program>
 {
     private readonly SqliteConnection _connection = new("DataSource=:memory:");
@@ -31,6 +32,9 @@ public class TestingWebApplicationFactory : WebApplicationFactory<Program>
 
             services.RemoveAll<IDocumentService>();
             services.AddSingleton<IDocumentService, FakeDocumentService>();
+
+            services.RemoveAll<INewsNotificationQueue>();
+            services.AddSingleton<INewsNotificationQueue, FakeNewsNotificationQueue>();
 
             using var scope = services.BuildServiceProvider().CreateScope();
             var dbContext = scope.ServiceProvider.GetRequiredService<AppDbContext>();
