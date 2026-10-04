@@ -122,18 +122,19 @@ function DocumentListPage() {
         <Link to="/dashboard">Tillbaka till dashboarden</Link>
       </p>
 
-      <p>
-        <label>
+      <div className="field">
+        <label className="field-label" htmlFor="document-search">
           Sök
-          <br />
-          <input
-            type="search"
-            value={search}
-            onChange={(event) => handleSearchChange(event.target.value)}
-            placeholder="Filnamn"
-          />
         </label>
-      </p>
+        <input
+          className="input"
+          id="document-search"
+          type="search"
+          value={search}
+          onChange={(event) => handleSearchChange(event.target.value)}
+          placeholder="Filnamn"
+        />
+      </div>
 
       {isUploadFormOpen ? (
         <DocumentUploadForm
@@ -142,64 +143,84 @@ function DocumentListPage() {
         />
       ) : (
         <p>
-          <button type="button" onClick={() => setIsUploadFormOpen(true)}>
+          <button
+            className="btn btn-primary"
+            type="button"
+            onClick={() => setIsUploadFormOpen(true)}
+          >
             Ladda upp dokument
           </button>
         </p>
       )}
 
       {isLoading && <p>Laddar...</p>}
-      {error && <p role="alert">{error}</p>}
-      {!isLoading && !error && documents.length === 0 && <p>Inga dokument hittades.</p>}
+      {error && (
+        <p className="alert alert-error" role="alert">
+          {error}
+        </p>
+      )}
+      {!isLoading && !error && documents.length === 0 && (
+        <p className="alert alert-info">Inga dokument hittades.</p>
+      )}
 
       {documents.length > 0 && (
-        <table>
-          <thead>
-            <tr>
-              <th>Filnamn</th>
-              <th>Storlek</th>
-              <th>Uppladdad av</th>
-              <th>Uppladdad</th>
-              <th>Åtgärder</th>
-            </tr>
-          </thead>
-          <tbody>
-            {documents.map((documentInfo) => (
-              <tr key={documentInfo.id}>
-                <td>
-                  <button
-                    type="button"
-                    onClick={() => handleDownload(documentInfo)}
-                    disabled={downloadingId === documentInfo.id}
-                  >
-                    {documentInfo.fileName}
-                  </button>
-                </td>
-                <td>{formatFileSize(documentInfo.sizeBytes)}</td>
-                <td>{documentInfo.uploadedBy}</td>
-                <td>{new Date(documentInfo.uploadedAt).toLocaleString('sv-SE')}</td>
-                <td>
-                  <button
-                    type="button"
-                    onClick={() => handleDelete(documentInfo)}
-                    disabled={deletingId === documentInfo.id}
-                  >
-                    Ta bort
-                  </button>
-                </td>
+        <div className="table-wrapper">
+          <table className="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>Filnamn</th>
+                <th>Storlek</th>
+                <th>Uppladdad av</th>
+                <th>Uppladdad</th>
+                <th>Åtgärder</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {documents.map((documentInfo) => (
+                <tr key={documentInfo.id}>
+                  <td>
+                    <button
+                      className="btn btn-secondary btn-sm"
+                      type="button"
+                      onClick={() => handleDownload(documentInfo)}
+                      disabled={downloadingId === documentInfo.id}
+                    >
+                      {documentInfo.fileName}
+                    </button>
+                  </td>
+                  <td>{formatFileSize(documentInfo.sizeBytes)}</td>
+                  <td>{documentInfo.uploadedBy}</td>
+                  <td>{new Date(documentInfo.uploadedAt).toLocaleString('sv-SE')}</td>
+                  <td>
+                    <button
+                      className="btn btn-danger btn-sm"
+                      type="button"
+                      onClick={() => handleDelete(documentInfo)}
+                      disabled={deletingId === documentInfo.id}
+                    >
+                      Ta bort
+                    </button>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
 
       {totalPages > 1 && (
         <p>
-          <button type="button" onClick={() => setPage((p) => p - 1)} disabled={page <= 1}>
+          <button
+            className="btn btn-secondary btn-sm"
+            type="button"
+            onClick={() => setPage((p) => p - 1)}
+            disabled={page <= 1}
+          >
             Föregående
           </button>{' '}
           Sida {page} av {totalPages}{' '}
           <button
+            className="btn btn-secondary btn-sm"
             type="button"
             onClick={() => setPage((p) => p + 1)}
             disabled={page >= totalPages}
