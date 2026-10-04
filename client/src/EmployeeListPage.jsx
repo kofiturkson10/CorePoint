@@ -95,22 +95,23 @@ function EmployeeListPage() {
         <Link to="/dashboard">Tillbaka till dashboarden</Link>
       </p>
 
-      <p>
-        <label>
+      <div className="field">
+        <label className="field-label" htmlFor="employee-search">
           Sök
-          <br />
-          <input
-            type="search"
-            value={search}
-            onChange={(event) => handleSearchChange(event.target.value)}
-            placeholder="Namn, avdelning eller e-post"
-          />
         </label>
-      </p>
+        <input
+          id="employee-search"
+          className="input"
+          type="search"
+          value={search}
+          onChange={(event) => handleSearchChange(event.target.value)}
+          placeholder="Namn, avdelning eller e-post"
+        />
+      </div>
 
       {formTarget === null ? (
         <p>
-          <button type="button" onClick={() => setFormTarget('new')}>
+          <button type="button" className="btn btn-primary" onClick={() => setFormTarget('new')}>
             Lägg till medarbetare
           </button>
         </p>
@@ -124,54 +125,77 @@ function EmployeeListPage() {
         />
       )}
 
-      {isLoading && <p>Laddar...</p>}
-      {error && <p role="alert">{error}</p>}
-      {!isLoading && !error && employees.length === 0 && <p>Inga medarbetare hittades.</p>}
+      {isLoading && <p className="alert alert-info" role="status">Laddar...</p>}
+      {error && (
+        <p className="alert alert-error" role="alert">
+          {error}
+        </p>
+      )}
+      {!isLoading && !error && employees.length === 0 && (
+        <p className="alert alert-info">Inga medarbetare hittades.</p>
+      )}
 
       {employees.length > 0 && (
-        <table>
-          <thead>
-            <tr>
-              <th>Namn</th>
-              <th>Avdelning</th>
-              <th>Roll</th>
-              <th>E-post</th>
-              <th>Åtgärder</th>
-            </tr>
-          </thead>
-          <tbody>
-            {employees.map((employee) => (
-              <tr key={employee.id}>
-                <td>{employee.name}</td>
-                <td>{employee.department}</td>
-                <td>{employee.role}</td>
-                <td>{employee.email}</td>
-                <td>
-                  <button type="button" onClick={() => setFormTarget(employee)}>
-                    Redigera
-                  </button>{' '}
-                  <button
-                    type="button"
-                    onClick={() => handleDelete(employee)}
-                    disabled={deletingId === employee.id}
-                  >
-                    Ta bort
-                  </button>
-                </td>
+        <div className="table-wrapper">
+          <table className="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>Namn</th>
+                <th>Avdelning</th>
+                <th>Roll</th>
+                <th>E-post</th>
+                <th>Åtgärder</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {employees.map((employee) => (
+                <tr key={employee.id}>
+                  <td>{employee.name}</td>
+                  <td>{employee.department}</td>
+                  <td>{employee.role}</td>
+                  <td>{employee.email}</td>
+                  <td>
+                    <div className="table-actions">
+                      <button
+                        type="button"
+                        className="btn btn-secondary btn-sm"
+                        onClick={() => setFormTarget(employee)}
+                      >
+                        Redigera
+                      </button>
+                      <button
+                        type="button"
+                        className="btn btn-danger btn-sm"
+                        onClick={() => handleDelete(employee)}
+                        disabled={deletingId === employee.id}
+                      >
+                        Ta bort
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
 
       {totalPages > 1 && (
-        <p>
-          <button type="button" onClick={() => setPage((p) => p - 1)} disabled={page <= 1}>
-            Föregående
-          </button>{' '}
-          Sida {page} av {totalPages}{' '}
+        <p style={{ display: 'flex', alignItems: 'center', gap: 'var(--space-3)' }}>
           <button
             type="button"
+            className="btn btn-secondary btn-sm"
+            onClick={() => setPage((p) => p - 1)}
+            disabled={page <= 1}
+          >
+            Föregående
+          </button>
+          <span>
+            Sida {page} av {totalPages}
+          </span>
+          <button
+            type="button"
+            className="btn btn-secondary btn-sm"
             onClick={() => setPage((p) => p + 1)}
             disabled={page >= totalPages}
           >
