@@ -2,7 +2,11 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { readErrorMessage } from './apiErrors.js'
 import { useAuth } from './authContext.js'
-import { LEAVE_REQUEST_STATUS, leaveRequestStatusLabel } from './leaveRequestStatus.js'
+import {
+  LEAVE_REQUEST_STATUS,
+  leaveRequestStatusBadgeClass,
+  leaveRequestStatusLabel,
+} from './leaveRequestStatus.js'
 
 // Only Admin/HR may use this page - see the App.jsx / DashboardPage.jsx RBAC notes.
 function ManageLeaveRequestsPage() {
@@ -67,7 +71,9 @@ function ManageLeaveRequestsPage() {
       <main>
         <h1>Företagsportal</h1>
         <h2>Hantera ansökningar</h2>
-        <p role="alert">Du har inte behörighet att se den här sidan.</p>
+        <p className="alert alert-error" role="alert">
+          Du har inte behörighet att se den här sidan.
+        </p>
         <p>
           <Link to="/dashboard">Tillbaka till dashboarden</Link>
         </p>
@@ -84,52 +90,68 @@ function ManageLeaveRequestsPage() {
       </p>
 
       {isLoading && <p>Laddar...</p>}
-      {error && <p role="alert">{error}</p>}
-      {!isLoading && !error && leaveRequests.length === 0 && <p>Inga ansökningar hittades.</p>}
+      {error && (
+        <p className="alert alert-error" role="alert">
+          {error}
+        </p>
+      )}
+      {!isLoading && !error && leaveRequests.length === 0 && (
+        <p className="alert alert-info">Inga ansökningar hittades.</p>
+      )}
 
       {leaveRequests.length > 0 && (
-        <table>
-          <thead>
-            <tr>
-              <th>Sökande</th>
-              <th>Startdatum</th>
-              <th>Slutdatum</th>
-              <th>Anledning</th>
-              <th>Status</th>
-              <th>Åtgärder</th>
-            </tr>
-          </thead>
-          <tbody>
-            {leaveRequests.map((leaveRequest) => {
-              const isPending = leaveRequest.status === LEAVE_REQUEST_STATUS.PENDING
-              return (
-                <tr key={leaveRequest.id}>
-                  <td>{leaveRequest.requesterEmail || '(okänd användare)'}</td>
-                  <td>{new Date(leaveRequest.startDate).toLocaleDateString('sv-SE')}</td>
-                  <td>{new Date(leaveRequest.endDate).toLocaleDateString('sv-SE')}</td>
-                  <td>{leaveRequest.reason || '–'}</td>
-                  <td>{leaveRequestStatusLabel(leaveRequest.status)}</td>
-                  <td>
-                    <button
-                      type="button"
-                      onClick={() => handleReview(leaveRequest, 'approve')}
-                      disabled={!isPending || reviewingId === leaveRequest.id}
-                    >
-                      Godkänn
-                    </button>{' '}
-                    <button
-                      type="button"
-                      onClick={() => handleReview(leaveRequest, 'reject')}
-                      disabled={!isPending || reviewingId === leaveRequest.id}
-                    >
-                      Avslå
-                    </button>
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
+        <div className="table-wrapper">
+          <table className="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>Sökande</th>
+                <th>Startdatum</th>
+                <th>Slutdatum</th>
+                <th>Anledning</th>
+                <th>Status</th>
+                <th>Åtgärder</th>
+              </tr>
+            </thead>
+            <tbody>
+              {leaveRequests.map((leaveRequest) => {
+                const isPending = leaveRequest.status === LEAVE_REQUEST_STATUS.PENDING
+                return (
+                  <tr key={leaveRequest.id}>
+                    <td>{leaveRequest.requesterEmail || '(okänd användare)'}</td>
+                    <td>{new Date(leaveRequest.startDate).toLocaleDateString('sv-SE')}</td>
+                    <td>{new Date(leaveRequest.endDate).toLocaleDateString('sv-SE')}</td>
+                    <td>{leaveRequest.reason || '–'}</td>
+                    <td>
+                      <span className={leaveRequestStatusBadgeClass(leaveRequest.status)}>
+                        {leaveRequestStatusLabel(leaveRequest.status)}
+                      </span>
+                    </td>
+                    <td>
+                      <div className="table-actions">
+                        <button
+                          className="btn btn-primary btn-sm"
+                          type="button"
+                          onClick={() => handleReview(leaveRequest, 'approve')}
+                          disabled={!isPending || reviewingId === leaveRequest.id}
+                        >
+                          Godkänn
+                        </button>
+                        <button
+                          className="btn btn-danger btn-sm"
+                          type="button"
+                          onClick={() => handleReview(leaveRequest, 'reject')}
+                          disabled={!isPending || reviewingId === leaveRequest.id}
+                        >
+                          Avslå
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
       )}
     </main>
   )

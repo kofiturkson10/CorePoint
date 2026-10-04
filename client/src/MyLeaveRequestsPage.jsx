@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { readErrorMessage } from './apiErrors.js'
 import LeaveRequestForm from './LeaveRequestForm.jsx'
-import { leaveRequestStatusLabel } from './leaveRequestStatus.js'
+import { leaveRequestStatusBadgeClass, leaveRequestStatusLabel } from './leaveRequestStatus.js'
 
 function MyLeaveRequestsPage() {
   const [leaveRequests, setLeaveRequests] = useState([])
@@ -49,30 +49,42 @@ function MyLeaveRequestsPage() {
 
       <h3>Tidigare ansökningar</h3>
       {isLoading && <p>Laddar...</p>}
-      {error && <p role="alert">{error}</p>}
-      {!isLoading && !error && leaveRequests.length === 0 && <p>Du har inga ansökningar än.</p>}
+      {error && (
+        <p className="alert alert-error" role="alert">
+          {error}
+        </p>
+      )}
+      {!isLoading && !error && leaveRequests.length === 0 && (
+        <p className="alert alert-info">Du har inga ansökningar än.</p>
+      )}
 
       {leaveRequests.length > 0 && (
-        <table>
-          <thead>
-            <tr>
-              <th>Startdatum</th>
-              <th>Slutdatum</th>
-              <th>Anledning</th>
-              <th>Status</th>
-            </tr>
-          </thead>
-          <tbody>
-            {leaveRequests.map((leaveRequest) => (
-              <tr key={leaveRequest.id}>
-                <td>{new Date(leaveRequest.startDate).toLocaleDateString('sv-SE')}</td>
-                <td>{new Date(leaveRequest.endDate).toLocaleDateString('sv-SE')}</td>
-                <td>{leaveRequest.reason || '–'}</td>
-                <td>{leaveRequestStatusLabel(leaveRequest.status)}</td>
+        <div className="table-wrapper">
+          <table className="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>Startdatum</th>
+                <th>Slutdatum</th>
+                <th>Anledning</th>
+                <th>Status</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {leaveRequests.map((leaveRequest) => (
+                <tr key={leaveRequest.id}>
+                  <td>{new Date(leaveRequest.startDate).toLocaleDateString('sv-SE')}</td>
+                  <td>{new Date(leaveRequest.endDate).toLocaleDateString('sv-SE')}</td>
+                  <td>{leaveRequest.reason || '–'}</td>
+                  <td>
+                    <span className={leaveRequestStatusBadgeClass(leaveRequest.status)}>
+                      {leaveRequestStatusLabel(leaveRequest.status)}
+                    </span>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </main>
   )
