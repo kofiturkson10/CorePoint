@@ -16,3 +16,14 @@ const STATUS_LABELS = {
 export function leaveRequestStatusLabel(status) {
   return STATUS_LABELS[status] ?? 'Okänd'
 }
+
+// Visual only: which design-system badge (components.css) each status is shown with
+const STATUS_BADGE_CLASSES = {
+  [LEAVE_REQUEST_STATUS.PENDING]: 'badge badge-warning',
+  [LEAVE_REQUEST_STATUS.APPROVED]: 'badge badge-success',
+  [LEAVE_REQUEST_STATUS.REJECTED]: 'badge badge-error',
+}
+
+export function leaveRequestStatusBadgeClass(status) {
+  return STATUS_BADGE_CLASSES[status] ?? 'badge badge-neutral'
+}

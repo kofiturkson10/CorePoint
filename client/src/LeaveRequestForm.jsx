@@ -46,47 +46,54 @@ function LeaveRequestForm({ onCreated }) {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form className="card" onSubmit={handleSubmit} style={{ marginBottom: 'var(--space-4)' }}>
       <h3>Ny ansökan</h3>
-      <p>
-        <label>
+      <div className="field">
+        <label className="field-label" htmlFor="leave-start-date">
           Startdatum
-          <br />
-          <input
-            type="date"
-            value={startDate}
-            onChange={(event) => setStartDate(event.target.value)}
-            required
-          />
         </label>
-      </p>
-      <p>
-        <label>
+        <input
+          className="input"
+          id="leave-start-date"
+          type="date"
+          value={startDate}
+          onChange={(event) => setStartDate(event.target.value)}
+          required
+        />
+      </div>
+      <div className="field">
+        <label className="field-label" htmlFor="leave-end-date">
           Slutdatum
-          <br />
-          <input
-            type="date"
-            value={endDate}
-            onChange={(event) => setEndDate(event.target.value)}
-            required
-          />
         </label>
-      </p>
-      <p>
-        <label>
+        <input
+          className="input"
+          id="leave-end-date"
+          type="date"
+          value={endDate}
+          onChange={(event) => setEndDate(event.target.value)}
+          required
+        />
+      </div>
+      <div className="field">
+        <label className="field-label" htmlFor="leave-reason">
           Anledning (valfritt)
-          <br />
-          <textarea
-            value={reason}
-            onChange={(event) => setReason(event.target.value)}
-            maxLength={1000}
-            rows={3}
-            cols={50}
-          />
         </label>
-      </p>
-      {error && <p role="alert">{error}</p>}
-      <button type="submit" disabled={isSubmitting}>
+        <textarea
+          className="input"
+          id="leave-reason"
+          value={reason}
+          onChange={(event) => setReason(event.target.value)}
+          maxLength={1000}
+          rows={3}
+        />
+        <span className="field-hint">Max 1000 tecken</span>
+      </div>
+      {error && (
+        <p className="alert alert-error" role="alert">
+          {error}
+        </p>
+      )}
+      <button className="btn btn-primary" type="submit" disabled={isSubmitting}>
         {isSubmitting ? 'Skickar...' : 'Skicka ansökan'}
       </button>
     </form>
