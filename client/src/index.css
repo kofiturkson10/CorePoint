@@ -1,10 +1,53 @@
+/* Global base styles - typography and colors come from styles/theme.css */
+
 body {
-  font-family: system-ui, sans-serif;
   margin: 0;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
 }
 
 main {
   max-width: 40rem;
-  margin: 2rem auto;
-  padding: 0 1rem;
+  margin: var(--space-6) auto;
+  padding: 0 var(--space-4);
+}
+
+h1,
+h2,
+h3 {
+  line-height: var(--line-height-tight);
+  color: var(--color-text);
+}
+
+/* Every page starts with "Företagsportal" (h1) followed by the page name (h2) */
+h1 {
+  margin: 0 0 var(--space-1);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--color-primary);
+}
+
+h2 {
+  margin: 0 0 var(--space-4);
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-bold);
+}
+
+h3 {
+  font-size: var(--font-size-lg);
+  font-weight: var(--font-weight-semibold);
+}
+
+a {
+  color: var(--color-primary);
+  text-underline-offset: 2px;
+}
+
+a:hover {
+  color: var(--color-primary-hover);
 }
