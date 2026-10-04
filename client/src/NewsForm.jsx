@@ -36,39 +36,46 @@ function NewsForm({ newsItem, onSaved, onCancel }) {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form className="card" onSubmit={handleSubmit} style={{ marginBottom: 'var(--space-4)' }}>
       <h3>{isEditing ? 'Redigera nyhet' : 'Ny nyhet'}</h3>
-      <p>
-        <label>
+      <div className="field">
+        <label className="field-label" htmlFor="news-title">
           Titel
-          <br />
-          <input
-            value={title}
-            onChange={(event) => setTitle(event.target.value)}
-            required
-            maxLength={200}
-          />
         </label>
-      </p>
-      <p>
-        <label>
+        <input
+          className="input"
+          id="news-title"
+          value={title}
+          onChange={(event) => setTitle(event.target.value)}
+          required
+          maxLength={200}
+        />
+        <span className="field-hint">Max 200 tecken</span>
+      </div>
+      <div className="field">
+        <label className="field-label" htmlFor="news-content">
           Innehåll
-          <br />
-          <textarea
-            value={content}
-            onChange={(event) => setContent(event.target.value)}
-            required
-            maxLength={10000}
-            rows={6}
-            cols={50}
-          />
         </label>
-      </p>
-      {error && <p role="alert">{error}</p>}
-      <button type="submit" disabled={isSubmitting}>
+        <textarea
+          className="input"
+          id="news-content"
+          value={content}
+          onChange={(event) => setContent(event.target.value)}
+          required
+          maxLength={10000}
+          rows={6}
+          cols={50}
+        />
+      </div>
+      {error && (
+        <p className="alert alert-error" role="alert">
+          {error}
+        </p>
+      )}
+      <button className="btn btn-primary" type="submit" disabled={isSubmitting}>
         {isSubmitting ? 'Sparar...' : 'Spara'}
       </button>{' '}
-      <button type="button" onClick={onCancel} disabled={isSubmitting}>
+      <button className="btn btn-secondary" type="button" onClick={onCancel} disabled={isSubmitting}>
         Avbryt
       </button>
     </form>

@@ -80,7 +80,7 @@ function NewsListPage() {
 
       {formTarget === null ? (
         <p>
-          <button type="button" onClick={() => setFormTarget('new')}>
+          <button className="btn btn-primary" type="button" onClick={() => setFormTarget('new')}>
             Lägg till nyhet
           </button>
         </p>
@@ -95,23 +95,32 @@ function NewsListPage() {
       )}
 
       {isLoading && <p>Laddar...</p>}
-      {error && <p role="alert">{error}</p>}
-      {!isLoading && !error && newsItems.length === 0 && <p>Inga nyheter hittades.</p>}
+      {error && (
+        <p className="alert alert-error" role="alert">
+          {error}
+        </p>
+      )}
+      {!isLoading && !error && newsItems.length === 0 && (
+        <p className="alert alert-info">Inga nyheter hittades.</p>
+      )}
 
       {newsItems.map((newsItem) => (
-        <article key={newsItem.id}>
+        <article key={newsItem.id} className="card" style={{ marginBottom: 'var(--space-4)' }}>
           <h3>{newsItem.title}</h3>
-          <p>
-            <small>
-              {newsItem.author} · {new Date(newsItem.publishedAt).toLocaleString('sv-SE')}
-            </small>
+          <p style={{ fontSize: 'var(--font-size-sm)', color: 'var(--color-text-muted)' }}>
+            {newsItem.author} · {new Date(newsItem.publishedAt).toLocaleString('sv-SE')}
           </p>
           {/* pre-wrap keeps the line breaks the author typed */}
           <p style={{ whiteSpace: 'pre-wrap' }}>{newsItem.content}</p>
-          <button type="button" onClick={() => setFormTarget(newsItem)}>
+          <button
+            className="btn btn-secondary btn-sm"
+            type="button"
+            onClick={() => setFormTarget(newsItem)}
+          >
             Redigera
           </button>{' '}
           <button
+            className="btn btn-danger btn-sm"
             type="button"
             onClick={() => handleDelete(newsItem)}
             disabled={deletingId === newsItem.id}
