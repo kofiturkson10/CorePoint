@@ -492,3 +492,5 @@ server/publish.zip
 
 # Lokala inställningar
 appsettings.Development.json
+functions/CorePoint.Functions/functionapp.zip
+functions/CorePoint.Functions/publish_output/
