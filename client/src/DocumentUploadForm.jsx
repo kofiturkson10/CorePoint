@@ -42,24 +42,35 @@ function DocumentUploadForm({ onUploaded, onCancel }) {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form className="card" onSubmit={handleSubmit} style={{ marginBottom: 'var(--space-4)' }}>
       <h3>Ladda upp dokument</h3>
-      <p>
-        <label>
-          Fil (max 10 MB)
-          <br />
-          <input
-            type="file"
-            onChange={(event) => setFile(event.target.files[0] ?? null)}
-            required
-          />
+      <div className="field">
+        <label className="field-label" htmlFor="document-file">
+          Fil
         </label>
-      </p>
-      {error && <p role="alert">{error}</p>}
-      <button type="submit" disabled={isSubmitting || file === null}>
+        <input
+          className="input"
+          id="document-file"
+          type="file"
+          onChange={(event) => setFile(event.target.files[0] ?? null)}
+          required
+        />
+        <span className="field-hint">Max 10 MB</span>
+      </div>
+      {error && (
+        <p className="alert alert-error" role="alert">
+          {error}
+        </p>
+      )}
+      <button className="btn btn-primary" type="submit" disabled={isSubmitting || file === null}>
         {isSubmitting ? 'Laddar upp...' : 'Ladda upp'}
       </button>{' '}
-      <button type="button" onClick={onCancel} disabled={isSubmitting}>
+      <button
+        className="btn btn-secondary"
+        type="button"
+        onClick={onCancel}
+        disabled={isSubmitting}
+      >
         Avbryt
       </button>
     </form>
