@@ -73,7 +73,9 @@ function ManageRoomsPage() {
       <main>
         <h1>Företagsportal</h1>
         <h2>Hantera rum</h2>
-        <p role="alert">Du har inte behörighet att se den här sidan.</p>
+        <p className="alert alert-error" role="alert">
+          Du har inte behörighet att se den här sidan.
+        </p>
         <p>
           <Link to="/dashboard">Tillbaka till dashboarden</Link>
         </p>
@@ -91,39 +93,52 @@ function ManageRoomsPage() {
 
       <RoomForm onCreated={handleCreated} />
 
-      {isLoading && <p>Laddar...</p>}
-      {error && <p role="alert">{error}</p>}
-      {!isLoading && !error && rooms.length === 0 && <p>Inga rum hittades.</p>}
+      {isLoading && (
+        <p className="alert alert-info" role="status">
+          Laddar...
+        </p>
+      )}
+      {error && (
+        <p className="alert alert-error" role="alert">
+          {error}
+        </p>
+      )}
+      {!isLoading && !error && rooms.length === 0 && <p className="alert alert-info">Inga rum hittades.</p>}
 
       {rooms.length > 0 && (
-        <table>
-          <thead>
-            <tr>
-              <th>Namn</th>
-              <th>Kapacitet</th>
-              <th>Plats</th>
-              <th>Åtgärder</th>
-            </tr>
-          </thead>
-          <tbody>
-            {rooms.map((room) => (
-              <tr key={room.id}>
-                <td>{room.name}</td>
-                <td>{room.capacity}</td>
-                <td>{room.location || '–'}</td>
-                <td>
-                  <button
-                    type="button"
-                    onClick={() => handleDelete(room)}
-                    disabled={deletingId === room.id}
-                  >
-                    Ta bort
-                  </button>
-                </td>
+        <div className="table-wrapper">
+          <table className="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>Namn</th>
+                <th>Kapacitet</th>
+                <th>Plats</th>
+                <th>Åtgärder</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {rooms.map((room) => (
+                <tr key={room.id}>
+                  <td>{room.name}</td>
+                  <td>{room.capacity}</td>
+                  <td>{room.location || '–'}</td>
+                  <td>
+                    <div className="table-actions">
+                      <button
+                        type="button"
+                        className="btn btn-danger btn-sm"
+                        onClick={() => handleDelete(room)}
+                        disabled={deletingId === room.id}
+                      >
+                        Ta bort
+                      </button>
+                    </div>
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       )}
     </main>
   )
