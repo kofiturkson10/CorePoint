@@ -1,0 +1,90 @@
+/*
+ * Design tokens for Företagsportal.
+ *
+ * Only CSS custom properties live here - no selectors that style elements.
+ * Use the variables in page/component CSS instead of hard-coded values,
+ * e.g. `padding: var(--space-4); color: var(--color-text-muted);`
+ */
+
+:root {
+  /* ---- Colors ---- */
+
+  /* Primary: calm corporate blue, used for main actions and links */
+  --color-primary: #1f4fd1;
+  --color-primary-hover: #1a41ad;
+  --color-primary-subtle: #e8eefc;
+  --color-on-primary: #ffffff;
+
+  /* Secondary: neutral slate, used for less important actions */
+  --color-secondary: #475569;
+  --color-secondary-hover: #334155;
+  --color-secondary-subtle: #eef1f5;
+  --color-on-secondary: #ffffff;
+
+  /* Surfaces and text */
+  --color-background: #f6f7f9;
+  --color-surface: #ffffff;
+  --color-border: #d6dbe3;
+  --color-border-strong: #a9b2c0;
+  --color-text: #1a2233;
+  --color-text-muted: #5b6475;
+
+  /* Status colors (each with a light background variant for messages) */
+  --color-success: #15803d;
+  --color-success-subtle: #e7f6ec;
+  --color-error: #c62828;
+  --color-error-hover: #a51f1f;
+  --color-error-subtle: #fdecec;
+  --color-warning: #b45309;
+  --color-warning-subtle: #fef4e6;
+  --color-info: #0b6aa2;
+  --color-info-subtle: #e6f2f9;
+
+  /* Table rows */
+  --color-row-stripe: #f9fafb;
+  --color-row-hover: #eef2fb;
+
+  --color-focus-ring: rgba(31, 79, 209, 0.35);
+
+  /* ---- Spacing (4px base) ---- */
+  --space-1: 0.25rem; /*  4px */
+  --space-2: 0.5rem;  /*  8px */
+  --space-3: 0.75rem; /* 12px */
+  --space-4: 1rem;    /* 16px */
+  --space-5: 1.5rem;  /* 24px */
+  --space-6: 2rem;    /* 32px */
+  --space-7: 3rem;    /* 48px */
+  --space-8: 4rem;    /* 64px */
+
+  /* ---- Typography ---- */
+  --font-family-base: system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  --font-family-mono: ui-monospace, SFMono-Regular, Consolas, 'Liberation Mono', monospace;
+
+  --font-size-sm: 0.875rem;  /* 14px - hints, table meta */
+  --font-size-base: 1rem;    /* 16px - body text */
+  --font-size-lg: 1.125rem;  /* 18px - h3 / card titles */
+  --font-size-xl: 1.5rem;    /* 24px - h2 / section headings */
+  --font-size-2xl: 2rem;     /* 32px - h1 / page titles */
+
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
+
+  --line-height-tight: 1.25;
+  --line-height-base: 1.5;
+
+  /* ---- Shape ---- */
+  --radius-sm: 4px;   /* inputs, small badges */
+  --radius-md: 6px;   /* buttons */
+  --radius-lg: 10px;  /* cards */
+  --radius-full: 9999px;
+
+  /* ---- Shadows ---- */
+  --shadow-sm: 0 1px 2px rgba(16, 24, 40, 0.06);
+  --shadow-md: 0 2px 6px rgba(16, 24, 40, 0.08), 0 1px 2px rgba(16, 24, 40, 0.04);
+  --shadow-lg: 0 8px 24px rgba(16, 24, 40, 0.12);
+
+  /* ---- Motion ---- */
+  --transition-fast: 120ms ease-in-out;
+}

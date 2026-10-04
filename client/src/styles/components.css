@@ -1,0 +1,282 @@
+/*
+ * Shared, opt-in component classes built on the tokens in theme.css.
+ *
+ * Nothing here targets bare elements, so existing pages are unaffected
+ * until a class is added. Usage:
+ *
+ *   <button className="btn btn-primary">Spara</button>
+ *   <button className="btn btn-secondary">Avbryt</button>
+ *   <button className="btn btn-danger">Ta bort</button>
+ *   <button className="btn btn-primary btn-sm">Liten</button>
+ *
+ *   <div className="field">
+ *     <label className="field-label" htmlFor="name">Namn</label>
+ *     <input className="input" id="name" />
+ *     <span className="field-hint">Max 100 tecken</span>
+ *   </div>
+ *   (add `input-invalid` + a `field-error` span for validation errors)
+ *
+ *   <section className="card">...</section>
+ *
+ *   <div className="table-wrapper">
+ *     <table className="table table-striped table-hover">...</table>
+ *   </div>
+ *   (`table-striped` and `table-hover` are optional and can be combined;
+ *    add `table-compact` for denser rows, `table-actions` on a <div> inside a cell with buttons)
+ *
+ *   <p className="alert alert-success" role="status">Nyhet skapad</p>
+ *   <p className="alert alert-error" role="alert">Kunde inte spara</p>
+ *   <p className="alert alert-warning">...</p>
+ *   <p className="alert alert-info">...</p>
+ *   (use role="alert" for errors, role="status" for confirmations)
+ */
+
+/* ---- Buttons ---- */
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-2);
+  padding: var(--space-2) var(--space-4);
+  border: 1px solid transparent;
+  border-radius: var(--radius-md);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  line-height: var(--line-height-tight);
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color var(--transition-fast), border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.btn:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+.btn:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+.btn-primary {
+  background-color: var(--color-primary);
+  color: var(--color-on-primary);
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-primary:hover:not(:disabled) {
+  background-color: var(--color-primary-hover);
+}
+
+.btn-secondary {
+  background-color: var(--color-surface);
+  border-color: var(--color-border-strong);
+  color: var(--color-secondary);
+}
+
+.btn-secondary:hover:not(:disabled) {
+  background-color: var(--color-secondary-subtle);
+  color: var(--color-secondary-hover);
+}
+
+.btn-danger {
+  background-color: var(--color-error);
+  color: #ffffff;
+  box-shadow: var(--shadow-sm);
+}
+
+.btn-danger:hover:not(:disabled) {
+  background-color: var(--color-error-hover);
+}
+
+.btn-sm {
+  padding: var(--space-1) var(--space-3);
+  font-size: var(--font-size-sm);
+}
+
+/* ---- Form fields ---- */
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+  margin-bottom: var(--space-4);
+}
+
+.field-label {
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text);
+}
+
+.field-hint {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-muted);
+}
+
+.field-error {
+  font-size: var(--font-size-sm);
+  color: var(--color-error);
+}
+
+/* Works for <input>, <select> and <textarea> */
+.input {
+  width: 100%;
+  box-sizing: border-box;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border-strong);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  font-family: var(--font-family-base);
+  font-size: var(--font-size-base);
+  line-height: var(--line-height-base);
+  transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+}
+
+.input::placeholder {
+  color: var(--color-text-muted);
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 3px var(--color-focus-ring);
+}
+
+.input:disabled {
+  background-color: var(--color-secondary-subtle);
+  cursor: not-allowed;
+}
+
+.input-invalid,
+.input-invalid:focus {
+  border-color: var(--color-error);
+}
+
+textarea.input {
+  min-height: 6rem;
+  resize: vertical;
+}
+
+/* ---- Card ---- */
+
+.card {
+  background-color: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-md);
+  padding: var(--space-5);
+}
+
+/* ---- Tables ---- */
+
+/* Lets wide tables scroll horizontally instead of breaking the layout */
+.table-wrapper {
+  overflow-x: auto;
+  margin-bottom: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-lg);
+  background-color: var(--color-surface);
+  box-shadow: var(--shadow-sm);
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+  color: var(--color-text);
+  text-align: left;
+}
+
+.table th,
+.table td {
+  padding: var(--space-3) var(--space-4);
+  border-bottom: 1px solid var(--color-border);
+  vertical-align: middle;
+}
+
+.table thead th {
+  background-color: var(--color-secondary-subtle);
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-semibold);
+  white-space: nowrap;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+.table-striped tbody tr:nth-child(even) {
+  background-color: var(--color-row-stripe);
+}
+
+.table-hover tbody tr {
+  transition: background-color var(--transition-fast);
+}
+
+.table-hover tbody tr:hover {
+  background-color: var(--color-row-hover);
+}
+
+.table-compact th,
+.table-compact td {
+  padding: var(--space-2) var(--space-3);
+}
+
+/* Wrapper inside a cell for row buttons, e.g. "Redigera" / "Ta bort":
+   <td><div className="table-actions">...</div></td>
+   (flex on the <td> itself would break the table layout) */
+.table-actions {
+  display: flex;
+  gap: var(--space-2);
+  white-space: nowrap;
+}
+
+/* ---- Alerts / messages ---- */
+
+.alert {
+  margin: 0 0 var(--space-4);
+  padding: var(--space-3) var(--space-4);
+  border: 1px solid transparent;
+  border-left-width: 4px;
+  border-radius: var(--radius-md);
+  font-size: var(--font-size-sm);
+  line-height: var(--line-height-base);
+  color: var(--color-text);
+}
+
+.alert-title {
+  display: block;
+  margin-bottom: var(--space-1);
+  font-weight: var(--font-weight-semibold);
+}
+
+.alert-success {
+  background-color: var(--color-success-subtle);
+  border-color: var(--color-success);
+}
+
+.alert-error {
+  background-color: var(--color-error-subtle);
+  border-color: var(--color-error);
+}
+
+.alert-warning {
+  background-color: var(--color-warning-subtle);
+  border-color: var(--color-warning);
+}
+
+.alert-info {
+  background-color: var(--color-info-subtle);
+  border-color: var(--color-info);
+}
+
+.alert-success .alert-title { color: var(--color-success); }
+.alert-error .alert-title { color: var(--color-error); }
+.alert-warning .alert-title { color: var(--color-warning); }
+.alert-info .alert-title { color: var(--color-info); }
