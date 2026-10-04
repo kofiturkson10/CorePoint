@@ -65,48 +65,60 @@ function BookingForm({ onCreated }) {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form className="card" style={{ marginBottom: 'var(--space-5)' }} onSubmit={handleSubmit}>
       <h3>Ny bokning</h3>
-      <p>
-        <label>
+      <div className="field">
+        <label className="field-label" htmlFor="booking-room">
           Rum
-          <br />
-          <select value={roomId} onChange={(event) => setRoomId(event.target.value)} required>
-            {rooms.length === 0 && <option value="">Inga rum tillgängliga</option>}
-            {rooms.map((room) => (
-              <option key={room.id} value={room.id}>
-                {room.name} ({room.capacity} platser)
-              </option>
-            ))}
-          </select>
         </label>
-      </p>
-      <p>
-        <label>
+        <select
+          id="booking-room"
+          className="input"
+          value={roomId}
+          onChange={(event) => setRoomId(event.target.value)}
+          required
+        >
+          {rooms.length === 0 && <option value="">Inga rum tillgängliga</option>}
+          {rooms.map((room) => (
+            <option key={room.id} value={room.id}>
+              {room.name} ({room.capacity} platser)
+            </option>
+          ))}
+        </select>
+      </div>
+      <div className="field">
+        <label className="field-label" htmlFor="booking-start">
           Starttid
-          <br />
-          <input
-            type="datetime-local"
-            value={startTime}
-            onChange={(event) => setStartTime(event.target.value)}
-            required
-          />
         </label>
-      </p>
-      <p>
-        <label>
+        <input
+          id="booking-start"
+          className="input"
+          type="datetime-local"
+          value={startTime}
+          onChange={(event) => setStartTime(event.target.value)}
+          required
+        />
+      </div>
+      <div className="field">
+        <label className="field-label" htmlFor="booking-end">
           Sluttid
-          <br />
-          <input
-            type="datetime-local"
-            value={endTime}
-            onChange={(event) => setEndTime(event.target.value)}
-            required
-          />
         </label>
-      </p>
-      {error && <p role="alert">{error}</p>}
-      <button type="submit" disabled={isSubmitting || rooms.length === 0}>
+        <input
+          id="booking-end"
+          className="input"
+          type="datetime-local"
+          value={endTime}
+          onChange={(event) => setEndTime(event.target.value)}
+          required
+        />
+      </div>
+      {/* Also shows the backend's 409 Conflict message when the room is already booked */}
+      {error && (
+        <p className="alert alert-error" role="alert">
+          {error}
+        </p>
+      )}
+      <button type="submit" className="btn btn-primary" disabled={isSubmitting || rooms.length === 0}>
         {isSubmitting ? 'Bokar...' : 'Boka rum'}
       </button>
     </form>

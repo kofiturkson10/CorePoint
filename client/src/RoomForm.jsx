@@ -35,46 +35,53 @@ function RoomForm({ onCreated }) {
   }
 
   return (
-    <form onSubmit={handleSubmit}>
+    <form className="card" style={{ marginBottom: 'var(--space-5)' }} onSubmit={handleSubmit}>
       <h3>Nytt rum</h3>
-      <p>
-        <label>
+      <div className="field">
+        <label className="field-label" htmlFor="room-name">
           Namn
-          <br />
-          <input
-            value={name}
-            onChange={(event) => setName(event.target.value)}
-            required
-            maxLength={100}
-          />
         </label>
-      </p>
-      <p>
-        <label>
+        <input
+          id="room-name"
+          className="input"
+          value={name}
+          onChange={(event) => setName(event.target.value)}
+          required
+          maxLength={100}
+        />
+      </div>
+      <div className="field">
+        <label className="field-label" htmlFor="room-capacity">
           Kapacitet
-          <br />
-          <input
-            type="number"
-            min="1"
-            value={capacity}
-            onChange={(event) => setCapacity(event.target.value)}
-            required
-          />
         </label>
-      </p>
-      <p>
-        <label>
+        <input
+          id="room-capacity"
+          className="input"
+          type="number"
+          min="1"
+          value={capacity}
+          onChange={(event) => setCapacity(event.target.value)}
+          required
+        />
+      </div>
+      <div className="field">
+        <label className="field-label" htmlFor="room-location">
           Plats (valfritt)
-          <br />
-          <input
-            value={location}
-            onChange={(event) => setLocation(event.target.value)}
-            maxLength={200}
-          />
         </label>
-      </p>
-      {error && <p role="alert">{error}</p>}
-      <button type="submit" disabled={isSubmitting}>
+        <input
+          id="room-location"
+          className="input"
+          value={location}
+          onChange={(event) => setLocation(event.target.value)}
+          maxLength={200}
+        />
+      </div>
+      {error && (
+        <p className="alert alert-error" role="alert">
+          {error}
+        </p>
+      )}
+      <button type="submit" className="btn btn-primary" disabled={isSubmitting}>
         {isSubmitting ? 'Sparar...' : 'Spara'}
       </button>
     </form>

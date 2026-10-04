@@ -76,48 +76,59 @@ function BookRoomPage() {
       <BookingForm onCreated={handleCreated} />
 
       <h3>Alla bokningar</h3>
-      {isLoading && <p>Laddar...</p>}
-      {error && <p role="alert">{error}</p>}
-      {!isLoading && !error && bookings.length === 0 && <p>Inga bokningar hittades.</p>}
+      {isLoading && (
+        <p className="alert alert-info" role="status">
+          Laddar...
+        </p>
+      )}
+      {error && (
+        <p className="alert alert-error" role="alert">
+          {error}
+        </p>
+      )}
+      {!isLoading && !error && bookings.length === 0 && <p className="alert alert-info">Inga bokningar hittades.</p>}
 
       {bookings.length > 0 && (
-        <table>
-          <thead>
-            <tr>
-              <th>Rum</th>
-              <th>Start</th>
-              <th>Slut</th>
-              <th>Bokad av</th>
-              <th>Åtgärder</th>
-            </tr>
-          </thead>
-          <tbody>
-            {bookings.map((booking) => {
-              // A booking is "mine" if its requester's email matches the logged-in user's -
-              // the API only exposes ids, not who "I" am as an id, so email is the shared key.
-              const isOwnBooking = booking.requesterEmail && booking.requesterEmail === user?.email
-              return (
-                <tr key={booking.id}>
-                  <td>{booking.roomName ?? '(okänt rum)'}</td>
-                  <td>{formatDateTime(booking.startTime)}</td>
-                  <td>{formatDateTime(booking.endTime)}</td>
-                  <td>{booking.requesterEmail || '(okänd användare)'}</td>
-                  <td>
-                    {isOwnBooking && (
-                      <button
-                        type="button"
-                        onClick={() => handleCancel(booking)}
-                        disabled={cancelingId === booking.id}
-                      >
-                        Avboka
-                      </button>
-                    )}
-                  </td>
-                </tr>
-              )
-            })}
-          </tbody>
-        </table>
+        <div className="table-wrapper">
+          <table className="table table-striped table-hover">
+            <thead>
+              <tr>
+                <th>Rum</th>
+                <th>Start</th>
+                <th>Slut</th>
+                <th>Bokad av</th>
+                <th>Åtgärder</th>
+              </tr>
+            </thead>
+            <tbody>
+              {bookings.map((booking) => {
+                // A booking is "mine" if its requester's email matches the logged-in user's -
+                // the API only exposes ids, not who "I" am as an id, so email is the shared key.
+                const isOwnBooking = booking.requesterEmail && booking.requesterEmail === user?.email
+                return (
+                  <tr key={booking.id}>
+                    <td>{booking.roomName ?? '(okänt rum)'}</td>
+                    <td>{formatDateTime(booking.startTime)}</td>
+                    <td>{formatDateTime(booking.endTime)}</td>
+                    <td>{booking.requesterEmail || '(okänd användare)'}</td>
+                    <td>
+                      {isOwnBooking && (
+                        <button
+                          type="button"
+                          className="btn btn-secondary btn-sm"
+                          onClick={() => handleCancel(booking)}
+                          disabled={cancelingId === booking.id}
+                        >
+                          Avboka
+                        </button>
+                      )}
+                    </td>
+                  </tr>
+                )
+              })}
+            </tbody>
+          </table>
+        </div>
       )}
     </main>
   )
